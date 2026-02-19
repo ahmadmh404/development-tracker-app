@@ -1,6 +1,6 @@
 "use server";
 
-import { db, projects, features, tasks, decisions } from "@/lib/db";
+import { db, projects } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -41,12 +41,11 @@ export async function getProjectById(id: string) {
     where: eq(projects.id, id),
     with: {
       features: {
-        with: {
-          tasks: true,
-          decisions: true,
-        },
+        columns: { status: true },
+        with: { tasks: { columns: { status: true } } },
       },
     },
+    columns: { status: true },
   });
 }
 

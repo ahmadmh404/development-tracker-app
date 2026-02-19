@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -11,19 +11,19 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Decision } from "@/lib/mockData";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 interface DecisionDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  children: ReactNode;
   decision?: Decision; // If provided, edit mode; otherwise, create mode
   onSave: (data: Partial<Decision>) => void;
 }
 
 export function DecisionDialog({
-  open,
-  onOpenChange,
+  children,
   decision,
   onSave,
 }: DecisionDialogProps) {
@@ -50,11 +50,12 @@ export function DecisionDialog({
       alternatives,
     };
     onSave(data);
-    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
@@ -115,9 +116,9 @@ export function DecisionDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
+          <DialogClose>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
           <Button onClick={handleSave} disabled={!decisionText}>
             {isEdit ? "Save Changes" : "Log Decision"}
           </Button>

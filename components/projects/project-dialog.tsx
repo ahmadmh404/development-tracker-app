@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,24 +14,24 @@ import {
 } from "@/components/ui/select";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Project, ProjectStatus } from "@/lib/mockData";
 
 interface ProjectDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  children: ReactNode;
   project?: Project; // If provided, edit mode; otherwise, create mode
   onSave: (data: Partial<Project>) => void;
 }
 
 export function ProjectDialog({
-  open,
-  onOpenChange,
+  children,
   project,
   onSave,
 }: ProjectDialogProps) {
@@ -57,11 +57,12 @@ export function ProjectDialog({
         .filter(Boolean),
     };
     onSave(data);
-    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
@@ -124,9 +125,9 @@ export function ProjectDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
+          <DialogClose>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
           <Button onClick={handleSave} disabled={!name}>
             {isEdit ? "Save Changes" : "Create Project"}
           </Button>

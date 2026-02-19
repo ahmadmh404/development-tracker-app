@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { Task } from "@/lib/mockData";
+import { tasks } from "@/lib/db";
 
 interface TaskItemProps {
-  task: Task;
+  task: Omit<typeof tasks.$inferSelect, "createdAt">;
 }
 
 export function TaskItem({ task }: TaskItemProps) {

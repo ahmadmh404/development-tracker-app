@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -20,10 +20,19 @@ import {
 import { ProjectSummary } from "@/components/project-summary";
 import { mockProjects } from "@/lib/mockData";
 import { ProjectDialog } from "@/components/projects/project-dialog";
+import { db, projects, tasks } from "@/lib/db";
+import { eq } from "drizzle-orm";
 
 export default function DashboardPage() {
+  return (
+    <Suspense>
+      <SuspendedDashboard />
+    </Suspense>
+  );
+}
+
+async function SuspendedDashboard() {
   const [projectDialogOpen, setProjectDialogOpen] = useState(false);
-  // Calculate stats
   const totalFeatures = mockProjects.reduce(
     (sum, p) => sum + p.features.length,
     0,
@@ -51,48 +60,6 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Active Projects
-            </CardTitle>
-            <FolderKanban className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activeProjects}</div>
-            <p className="text-xs text-muted-foreground">
-              {mockProjects.length} total projects
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Features
-            </CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalFeatures}</div>
-            <p className="text-xs text-muted-foreground">Across all projects</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Open Tasks</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{openTasks}</div>
-            <p className="text-xs text-muted-foreground">
-              {allTasks.length} total tasks
-            </p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Current Project CTA */}
       {currentProject && (
@@ -148,4 +115,87 @@ export default function DashboardPage() {
       />
     </div>
   );
+}
+
+// Dashboard Stats
+
+async function DashboardStats() {
+  const [activeProjects, totalFeatures, allTasks] = await Promise.all([
+    await getActiveProjectsCount(),
+    await getTotalFeaturesCount(),
+    await getOpenTasksCount(),
+  ]);
+
+  const openTasks = allTasks.filter(
+    (todo) => todo.status === "In Progress",
+  ).length;
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+          <FolderKanban className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{activeProjects}</div>
+          <p className="text-xs text-muted-foreground">
+            {mockProjects.length} total projects
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total Features</CardTitle>
+          <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{totalFeatures}</div>
+          <p className="text-xs text-muted-foreground">Across all projects</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Open Tasks</CardTitle>
+          <Clock className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{openTasks}</div>
+          <p className="text-xs text-muted-foreground">
+            {allTasks.length} total tasks
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// Stats queries.
+async function getActiveProjectsCount() {
+  const activeProjects = await db.query.projects.findMany({
+    where: eq(projects.status, "In Progress"),
+    columns: { id: true },
+  });
+
+  return activeProjects.length;
+}
+
+// Total features count.
+async function getTotalFeaturesCount() {
+  const features = await db.query.features.findMany({
+    columns: { id: true },
+  });
+
+  return features.length;
+}
+
+// Open tasks count.
+async function getOpenTasksCount() {
+  const todos = await db.query.tasks.findMany({
+    columns: { id: true, status: true },
+  });
+
+  return todos;
 }

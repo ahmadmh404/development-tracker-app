@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { Calendar, ThumbsUp, ThumbsDown, GitBranch } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import type { Decision } from '@/lib/mockData';
+import { Calendar, ThumbsUp, ThumbsDown, GitBranch } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { decisions } from "@/lib/db";
 
 interface DecisionCardProps {
-  decision: Decision;
+  decision: Omit<typeof decisions.$inferSelect, "createdAt">;
 }
 
 export function DecisionCard({ decision }: DecisionCardProps) {
@@ -30,7 +30,10 @@ export function DecisionCard({ decision }: DecisionCardProps) {
             </div>
             <ul className="space-y-1 pl-6">
               {decision.pros.map((pro, index) => (
-                <li key={index} className="text-sm text-muted-foreground list-disc">
+                <li
+                  key={index}
+                  className="text-sm text-muted-foreground list-disc"
+                >
                   {pro}
                 </li>
               ))}
@@ -46,7 +49,10 @@ export function DecisionCard({ decision }: DecisionCardProps) {
             </div>
             <ul className="space-y-1 pl-6">
               {decision.cons.map((con, index) => (
-                <li key={index} className="text-sm text-muted-foreground list-disc">
+                <li
+                  key={index}
+                  className="text-sm text-muted-foreground list-disc"
+                >
                   {con}
                 </li>
               ))}
@@ -60,7 +66,9 @@ export function DecisionCard({ decision }: DecisionCardProps) {
               <GitBranch className="h-4 w-4" />
               Alternatives Considered
             </div>
-            <p className="text-sm text-muted-foreground pl-6">{decision.alternatives}</p>
+            <p className="text-sm text-muted-foreground pl-6">
+              {decision.alternatives}
+            </p>
           </div>
         )}
       </CardContent>

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { Edit2, Trash2 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import Link from "next/link";
+import { Edit2, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -11,38 +11,42 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import type { Feature, Priority, FeatureStatus } from '@/lib/mockData';
-import { calculateProgress } from '@/lib/mockData';
+} from "@/components/ui/table";
+import { FeatureStatus, Priority } from "@/lib/mockData";
+import { Feature, tasks } from "@/lib/db";
+import { calculateProgress } from "@/app/actions/projects";
 
 interface FeatureListProps {
-  features: Feature[];
+  features: Omit<
+    Feature & { tasks: Pick<typeof tasks.$inferSelect, "status">[] },
+    "createdAt"
+  >[];
   projectId: string;
 }
 
 function getPriorityColor(priority: Priority) {
   switch (priority) {
-    case 'High':
-      return 'bg-red-500';
-    case 'Medium':
-      return 'bg-yellow-500';
-    case 'Low':
-      return 'bg-green-500';
+    case "High":
+      return "bg-red-500";
+    case "Medium":
+      return "bg-yellow-500";
+    case "Low":
+      return "bg-green-500";
     default:
-      return 'bg-gray-500';
+      return "bg-gray-500";
   }
 }
 
 function getStatusColor(status: FeatureStatus) {
   switch (status) {
-    case 'Done':
-      return 'bg-green-500';
-    case 'In Progress':
-      return 'bg-blue-500';
-    case 'To Do':
-      return 'bg-gray-500';
+    case "Done":
+      return "bg-green-500";
+    case "In Progress":
+      return "bg-blue-500";
+    case "To Do":
+      return "bg-gray-500";
     default:
-      return 'bg-gray-500';
+      return "bg-gray-500";
   }
 }
 
@@ -50,7 +54,9 @@ export function FeatureList({ features, projectId }: FeatureListProps) {
   if (features.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-border p-12 text-center">
-        <p className="text-muted-foreground">No features yet. Add your first feature to get started.</p>
+        <p className="text-muted-foreground">
+          No features yet. Add your first feature to get started.
+        </p>
       </div>
     );
   }
@@ -68,9 +74,12 @@ export function FeatureList({ features, projectId }: FeatureListProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
+          w
           {features.map((feature) => {
-            const progress = calculateProgress(feature.tasks);
-            const completedTasks = feature.tasks.filter((t) => t.status === 'Done').length;
+            const progress = calculateProgress(projectId);
+            const completedTasks = feature.tasks.filter(
+              (t) => t.status === "Done",
+            ).length;
             const totalTasks = feature.tasks.length;
 
             return (
@@ -82,15 +91,23 @@ export function FeatureList({ features, projectId }: FeatureListProps) {
                   >
                     {feature.name}
                   </Link>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {feature.description}
+                  </p>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className={getPriorityColor(feature.priority)}>
+                  <Badge
+                    variant="outline"
+                    className={getPriorityColor(feature.priority)}
+                  >
                     {feature.priority}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className={getStatusColor(feature.status)}>
+                  <Badge
+                    variant="outline"
+                    className={getStatusColor(feature.status)}
+                  >
                     {feature.status}
                   </Badge>
                 </TableCell>
@@ -108,7 +125,11 @@ export function FeatureList({ features, projectId }: FeatureListProps) {
                       <Edit2 className="h-4 w-4" />
                       <span className="sr-only">Edit feature</span>
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive"
+                    >
                       <Trash2 className="h-4 w-4" />
                       <span className="sr-only">Delete feature</span>
                     </Button>

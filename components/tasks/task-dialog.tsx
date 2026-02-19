@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,27 +14,23 @@ import {
 } from "@/components/ui/select";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Task, TaskStatus } from "@/lib/mockData";
 
 interface TaskDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  children: ReactNode;
   task?: Task; // If provided, edit mode; otherwise, create mode
   onSave: (data: Partial<Task>) => void;
 }
 
-export function TaskDialog({
-  open,
-  onOpenChange,
-  task,
-  onSave,
-}: TaskDialogProps) {
+export function TaskDialog({ children, task, onSave }: TaskDialogProps) {
   const isEdit = !!task;
 
   const [title, setTitle] = useState(task?.title || "");
@@ -54,11 +50,11 @@ export function TaskDialog({
       effortEstimate,
     };
     onSave(data);
-    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Task" : "Create New Task"}</DialogTitle>
@@ -124,9 +120,9 @@ export function TaskDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
+          <DialogClose>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
           <Button onClick={handleSave} disabled={!title}>
             {isEdit ? "Save Changes" : "Create Task"}
           </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,19 +19,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Feature, Priority, FeatureStatus } from "@/lib/mockData";
 
 interface FeatureDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  children: ReactNode;
   feature?: Feature; // If provided, edit mode; otherwise, create mode
   onSave: (data: Partial<Feature>) => void;
 }
 
 export function FeatureDialog({
-  open,
-  onOpenChange,
+  children,
   feature,
   onSave,
 }: FeatureDialogProps) {
@@ -58,11 +57,11 @@ export function FeatureDialog({
       effortEstimate,
     };
     onSave(data);
-    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -139,9 +138,7 @@ export function FeatureDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
+          <Button variant="outline">Cancel</Button>
           <Button onClick={handleSave} disabled={!name}>
             {isEdit ? "Save Changes" : "Create Feature"}
           </Button>

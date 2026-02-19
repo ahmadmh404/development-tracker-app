@@ -1,5 +1,7 @@
 // Mock data types and interfaces for the project tracker
 
+import { tasks } from "./db";
+
 export type Priority = "High" | "Medium" | "Low";
 export type ProjectStatus =
   | "Planning"
@@ -327,11 +329,4 @@ export function getRecentDecisions(limit: number = 10): Decision[] {
 // Helper function to get project by ID
 export function getProjectById(projectId: string): Project | undefined {
   return mockProjects.find((p) => p.id === projectId);
-}
-
-// Helper function to calculate progress percentage
-export function calculateProgress(tasks: Task[]): number {
-  if (tasks.length === 0) return 0;
-  const completedTasks = tasks.filter((t) => t.status === "Done").length;
-  return Math.round((completedTasks / tasks.length) * 100);
 }
