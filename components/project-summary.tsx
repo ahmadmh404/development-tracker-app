@@ -1,10 +1,10 @@
-import Link from 'next/link';
-import { Clock } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import type { Project } from '@/lib/mockData';
-import { calculateProgress } from '@/lib/mockData';
+import Link from "next/link";
+import { Clock } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import type { Project } from "@/lib/mockData";
+import { calculateProgress } from "@/lib/mockData";
 
 interface ProjectSummaryProps {
   project: Project;
@@ -14,7 +14,7 @@ export function ProjectSummary({ project }: ProjectSummaryProps) {
   // Calculate overall progress
   const allTasks = project.features.flatMap((f) => f.tasks);
   const progress = calculateProgress(allTasks);
-  const completedTasks = allTasks.filter((t) => t.status === 'Done').length;
+  const completedTasks = allTasks.filter((t) => t.status === "Done").length;
   const totalTasks = allTasks.length;
 
   return (
@@ -30,20 +30,20 @@ export function ProjectSummary({ project }: ProjectSummaryProps) {
             </div>
             <Badge
               variant={
-                project.status === 'In Progress'
-                  ? 'default'
-                  : project.status === 'Planning'
-                    ? 'secondary'
-                    : project.status === 'Launched'
-                      ? 'default'
-                      : 'outline'
+                project.status === "In Progress"
+                  ? "default"
+                  : project.status === "Planning"
+                    ? "secondary"
+                    : project.status === "Launched"
+                      ? "default"
+                      : "outline"
               }
               className={
-                project.status === 'In Progress'
-                  ? 'bg-blue-500'
-                  : project.status === 'Launched'
-                    ? 'bg-green-500'
-                    : ''
+                project.status === "In Progress"
+                  ? "bg-blue-500"
+                  : project.status === "Launched"
+                    ? "bg-green-500"
+                    : ""
               }
             >
               {project.status}
@@ -71,7 +71,9 @@ export function ProjectSummary({ project }: ProjectSummaryProps) {
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
-            <span>Updated {new Date(project.lastUpdated).toLocaleDateString()}</span>
+            <span>
+              Updated {new Date(project.lastUpdated).toLocaleDateString()}
+            </span>
           </div>
         </CardContent>
       </Card>

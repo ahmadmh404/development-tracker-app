@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { FolderKanban, Plus, Home } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { mockProjects } from '@/lib/mockData';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FolderKanban, Plus, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { mockProjects } from "@/lib/mockData";
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const activeProjectId = '1'; // Mock: first project is active
+  const activeProjectId = "1"; // Mock: first project is active
 
   return (
     <div className="flex h-full w-64 flex-col border-r border-border bg-sidebar">
@@ -29,10 +29,10 @@ export function AppSidebar() {
           <Link
             href="/"
             className={cn(
-              'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              pathname === '/'
-                ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              pathname === "/"
+                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                : "text-sidebar-foreground hover:bg-sidebar-accent/50",
             )}
           >
             <Home className="h-4 w-4" />
@@ -50,20 +50,21 @@ export function AppSidebar() {
                 key={project.id}
                 href={`/projects/${project.id}`}
                 className={cn(
-                  'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
                   pathname.startsWith(`/projects/${project.id}`)
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50',
-                  project.id === activeProjectId && 'border-l-2 border-sidebar-primary'
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+                  project.id === activeProjectId &&
+                    "border-l-2 border-sidebar-primary",
                 )}
               >
                 <div
                   className={cn(
-                    'h-2 w-2 rounded-full',
-                    project.status === 'In Progress' && 'bg-blue-500',
-                    project.status === 'Planning' && 'bg-yellow-500',
-                    project.status === 'Launched' && 'bg-green-500',
-                    project.status === 'Archived' && 'bg-gray-500'
+                    "h-2 w-2 rounded-full",
+                    project.status === "In Progress" && "bg-blue-500",
+                    project.status === "Planning" && "bg-yellow-500",
+                    project.status === "Launched" && "bg-green-500",
+                    project.status === "Archived" && "bg-gray-500",
                   )}
                 />
                 <span className="flex-1 truncate">{project.name}</span>

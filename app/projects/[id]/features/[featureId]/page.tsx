@@ -1,40 +1,30 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useParams } from 'next/navigation';
-import { Edit2, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { useState } from "react";
+import { useParams } from "next/navigation";
+import { Edit2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AppBreadcrumb } from '@/components/app-breadcrumb';
-import { TaskItem } from '@/components/task-item';
-import { DecisionCard } from '@/components/decision-card';
+} from "@/components/ui/select";
+import { AppBreadcrumb } from "@/components/app-breadcrumb";
+import { TaskItem } from "@/components/task-item";
+import { DecisionCard } from "@/components/decision-card";
 import {
   getProjectById,
   getFeatureById,
   getDecisionsForFeature,
   type Priority,
   type FeatureStatus,
-} from '@/lib/mockData';
+} from "@/lib/mockData";
+import { TaskDialog } from "@/components/tasks/task-dialog";
+import { DecisionDialog } from "@/components/decisions/decision-dialog";
 
 export default function FeatureDetailPage() {
   const params = useParams();
@@ -46,9 +36,15 @@ export default function FeatureDetailPage() {
   const decisions = getDecisionsForFeature(featureId);
 
   const [isEditingName, setIsEditingName] = useState(false);
-  const [featureName, setFeatureName] = useState(feature?.name || '');
-  const [priority, setPriority] = useState<Priority>(feature?.priority || 'Medium');
-  const [status, setStatus] = useState<FeatureStatus>(feature?.status || 'To Do');
+  const [featureName, setFeatureName] = useState(feature?.name || "");
+  const [priority, setPriority] = useState<Priority>(
+    feature?.priority || "Medium",
+  );
+  const [status, setStatus] = useState<FeatureStatus>(
+    feature?.status || "To Do",
+  );
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false);
+  const [decisionDialogOpen, setDecisionDialogOpen] = useState(false);
 
   if (!project || !feature) {
     return (
@@ -58,16 +54,18 @@ export default function FeatureDetailPage() {
     );
   }
 
-  const todoTasks = feature.tasks.filter((t) => t.status === 'To Do');
-  const inProgressTasks = feature.tasks.filter((t) => t.status === 'In Progress');
-  const doneTasks = feature.tasks.filter((t) => t.status === 'Done');
+  const todoTasks = feature.tasks.filter((t) => t.status === "To Do");
+  const inProgressTasks = feature.tasks.filter(
+    (t) => t.status === "In Progress",
+  );
+  const doneTasks = feature.tasks.filter((t) => t.status === "Done");
 
   return (
     <div className="container mx-auto space-y-6 p-6 md:p-8">
       {/* Breadcrumb */}
       <AppBreadcrumb
         items={[
-          { label: 'Dashboard', href: '/' },
+          { label: "Dashboard", href: "/" },
           { label: project.name, href: `/projects/${project.id}` },
           { label: feature.name },
         ]}
@@ -110,7 +108,10 @@ export default function FeatureDetailPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Select value={priority} onValueChange={(v) => setPriority(v as Priority)}>
+            <Select
+              value={priority}
+              onValueChange={(v) => setPriority(v as Priority)}
+            >
               <SelectTrigger className="w-[130px]">
                 <SelectValue />
               </SelectTrigger>
@@ -121,7 +122,10 @@ export default function FeatureDetailPage() {
               </SelectContent>
             </Select>
 
-            <Select value={status} onValueChange={(v) => setStatus(v as FeatureStatus)}>
+            <Select
+              value={status}
+              onValueChange={(v) => setStatus(v as FeatureStatus)}
+            >
               <SelectTrigger className="w-[150px]">
                 <SelectValue />
               </SelectTrigger>
@@ -142,154 +146,90 @@ export default function FeatureDetailPage() {
       {/* Main Content - Tasks and Decisions */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Tasks Section */}
-        <div className="space-y-4">
+        <div className="w-2/3 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Tasks</h2>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="sm">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Task
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Task</DialogTitle>
-                  <DialogDescription>
-                    Create a new task for this feature
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="task-title">Task Title</Label>
-                    <Input id="task-title" placeholder="e.g., Create login form" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="task-description">Description</Label>
-                    <Textarea
-                      id="task-description"
-                      placeholder="Describe the task..."
-                      rows={3}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="due-date">Due Date</Label>
-                    <Input id="due-date" type="date" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="task-effort">Effort Estimate</Label>
-                    <Input id="task-effort" placeholder="e.g., 2 hours" />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit">Create Task</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Button size="sm" onClick={() => setTaskDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Task
+            </Button>
           </div>
 
-          {/* Kanban-style task columns */}
-          <Tabs defaultValue="all" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="all">All ({feature.tasks.length})</TabsTrigger>
-              <TabsTrigger value="todo">To Do ({todoTasks.length})</TabsTrigger>
-              <TabsTrigger value="progress">In Progress ({inProgressTasks.length})</TabsTrigger>
-              <TabsTrigger value="done">Done ({doneTasks.length})</TabsTrigger>
-            </TabsList>
+          {/* Column-based task layout */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            {/* To Do Column */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2">
+                <h3 className="text-sm font-medium">To Do</h3>
+                <span className="text-xs text-muted-foreground">
+                  {todoTasks.length}
+                </span>
+              </div>
+              <div className="space-y-2">
+                {todoTasks.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-border p-4 text-center">
+                    <p className="text-xs text-muted-foreground">No tasks</p>
+                  </div>
+                ) : (
+                  todoTasks.map((task) => (
+                    <TaskItem key={task.id} task={task} />
+                  ))
+                )}
+              </div>
+            </div>
 
-            <TabsContent value="all" className="space-y-3">
-              {feature.tasks.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-border p-8 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    No tasks yet. Add your first task to get started.
-                  </p>
-                </div>
-              ) : (
-                feature.tasks.map((task) => <TaskItem key={task.id} task={task} />)
-              )}
-            </TabsContent>
+            {/* In Progress Column */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2">
+                <h3 className="text-sm font-medium">In Progress</h3>
+                <span className="text-xs text-muted-foreground">
+                  {inProgressTasks.length}
+                </span>
+              </div>
+              <div className="space-y-2">
+                {inProgressTasks.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-border p-4 text-center">
+                    <p className="text-xs text-muted-foreground">No tasks</p>
+                  </div>
+                ) : (
+                  inProgressTasks.map((task) => (
+                    <TaskItem key={task.id} task={task} />
+                  ))
+                )}
+              </div>
+            </div>
 
-            <TabsContent value="todo" className="space-y-3">
-              {todoTasks.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-border p-8 text-center">
-                  <p className="text-sm text-muted-foreground">No tasks in this column</p>
-                </div>
-              ) : (
-                todoTasks.map((task) => <TaskItem key={task.id} task={task} />)
-              )}
-            </TabsContent>
-
-            <TabsContent value="progress" className="space-y-3">
-              {inProgressTasks.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-border p-8 text-center">
-                  <p className="text-sm text-muted-foreground">No tasks in this column</p>
-                </div>
-              ) : (
-                inProgressTasks.map((task) => <TaskItem key={task.id} task={task} />)
-              )}
-            </TabsContent>
-
-            <TabsContent value="done" className="space-y-3">
-              {doneTasks.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-border p-8 text-center">
-                  <p className="text-sm text-muted-foreground">No tasks in this column</p>
-                </div>
-              ) : (
-                doneTasks.map((task) => <TaskItem key={task.id} task={task} />)
-              )}
-            </TabsContent>
-          </Tabs>
+            {/* Done Column */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2">
+                <h3 className="text-sm font-medium">Done</h3>
+                <span className="text-xs text-muted-foreground">
+                  {doneTasks.length}
+                </span>
+              </div>
+              <div className="space-y-2">
+                {doneTasks.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-border p-4 text-center">
+                    <p className="text-xs text-muted-foreground">No tasks</p>
+                  </div>
+                ) : (
+                  doneTasks.map((task) => (
+                    <TaskItem key={task.id} task={task} />
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Decisions Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Decisions</h2>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="sm">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Log Decision
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Log Decision</DialogTitle>
-                  <DialogDescription>
-                    Record an important technical or design decision
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="decision-text">Decision</Label>
-                    <Textarea
-                      id="decision-text"
-                      placeholder="What did you decide?"
-                      rows={3}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="pros">Pros (one per line)</Label>
-                    <Textarea id="pros" placeholder="Benefits..." rows={2} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cons">Cons (one per line)</Label>
-                    <Textarea id="cons" placeholder="Trade-offs..." rows={2} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="alternatives">Alternatives Considered</Label>
-                    <Textarea
-                      id="alternatives"
-                      placeholder="What else did you consider?"
-                      rows={2}
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit">Save Decision</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Button size="sm" onClick={() => setDecisionDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Log Decision
+            </Button>
           </div>
 
           <div className="space-y-4">
@@ -307,6 +247,18 @@ export default function FeatureDetailPage() {
           </div>
         </div>
       </div>
+
+      <TaskDialog
+        open={taskDialogOpen}
+        onOpenChange={setTaskDialogOpen}
+        onSave={() => {}}
+      />
+
+      <DecisionDialog
+        open={decisionDialogOpen}
+        onOpenChange={setDecisionDialogOpen}
+        onSave={() => {}}
+      />
     </div>
   );
 }

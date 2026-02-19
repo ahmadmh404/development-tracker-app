@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,7 +7,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+} from "@/components/ui/breadcrumb";
 
 interface BreadcrumbItem {
   label: string;
@@ -24,7 +24,7 @@ export function AppBreadcrumb({ items }: AppBreadcrumbProps) {
       <BreadcrumbList>
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
-          
+
           return (
             <div key={index} className="flex items-center">
               {index > 0 && (

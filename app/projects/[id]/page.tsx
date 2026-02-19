@@ -1,34 +1,25 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useParams } from 'next/navigation';
-import { Edit2, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useState } from "react";
+import { useParams } from "next/navigation";
+import { Edit2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { AppBreadcrumb } from '@/components/app-breadcrumb';
-import { FeatureList } from '@/components/feature-list';
-import { DecisionCard } from '@/components/decision-card';
-import { getProjectById, mockDecisions } from '@/lib/mockData';
+} from "@/components/ui/select";
+import { AppBreadcrumb } from "@/components/app-breadcrumb";
+import { FeatureList } from "@/components/feature-list";
+import { DecisionCard } from "@/components/decision-card";
+import { getProjectById, mockDecisions } from "@/lib/mockData";
+import type { Feature } from "@/lib/mockData";
+import { FeatureDialog } from "@/components/features/feature-dialog";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -36,7 +27,8 @@ export default function ProjectDetailPage() {
   const project = getProjectById(projectId);
 
   const [isEditingName, setIsEditingName] = useState(false);
-  const [projectName, setProjectName] = useState(project?.name || '');
+  const [projectName, setProjectName] = useState(project?.name || "");
+  const [featureDialogOpen, setFeatureDialogOpen] = useState(false);
 
   if (!project) {
     return (
@@ -58,10 +50,7 @@ export default function ProjectDetailPage() {
     <div className="container mx-auto space-y-6 p-6 md:p-8">
       {/* Breadcrumb */}
       <AppBreadcrumb
-        items={[
-          { label: 'Dashboard', href: '/' },
-          { label: project.name },
-        ]}
+        items={[{ label: "Dashboard", href: "/" }, { label: project.name }]}
       />
 
       {/* Project Header */}
@@ -75,10 +64,7 @@ export default function ProjectDetailPage() {
                   onChange={(e) => setProjectName(e.target.value)}
                   className="max-w-md"
                 />
-                <Button
-                  size="sm"
-                  onClick={() => setIsEditingName(false)}
-                >
+                <Button size="sm" onClick={() => setIsEditingName(false)}>
                   Save
                 </Button>
               </div>
@@ -140,56 +126,10 @@ export default function ProjectDetailPage() {
             <p className="text-sm text-muted-foreground">
               {project.features.length} features in total
             </p>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Feature
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Feature</DialogTitle>
-                  <DialogDescription>
-                    Create a new feature for this project
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="feature-name">Feature Name</Label>
-                    <Input id="feature-name" placeholder="e.g., User Authentication" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="priority">Priority</Label>
-                    <Select defaultValue="Medium">
-                      <SelectTrigger id="priority">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="High">High</SelectItem>
-                        <SelectItem value="Medium">Medium</SelectItem>
-                        <SelectItem value="Low">Low</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="effort">Effort Estimate</Label>
-                    <Input id="effort" placeholder="e.g., 8 hours" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Describe the feature..."
-                      rows={3}
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit">Create Feature</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Button onClick={() => setFeatureDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Feature
+            </Button>
           </div>
 
           <FeatureList features={project.features} projectId={project.id} />
@@ -211,6 +151,15 @@ export default function ProjectDetailPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      <FeatureDialog
+        open={featureDialogOpen}
+        onOpenChange={setFeatureDialogOpen}
+        onSave={(data) => {
+          console.log("[v0] Creating new feature:", data);
+          // In a real app, this would save to database
+        }}
+      />
     </div>
   );
 }
