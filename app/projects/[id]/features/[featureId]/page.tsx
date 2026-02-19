@@ -23,8 +23,8 @@ import {
   type Priority,
   type FeatureStatus,
 } from "@/lib/mockData";
-import { TaskDialog } from "@/components/tasks/task-dialog";
 import { DecisionDialog } from "@/components/decisions/decision-dialog";
+import { TaskDialog } from "@/components/tasks/task-dialog";
 
 export default function FeatureDetailPage() {
   const params = useParams();
@@ -144,7 +144,7 @@ export default function FeatureDetailPage() {
       </div>
 
       {/* Main Content - Tasks and Decisions */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="flex gap-6 lg:grid-cols-2">
         {/* Tasks Section */}
         <div className="w-2/3 space-y-4">
           <div className="flex items-center justify-between">
@@ -223,7 +223,7 @@ export default function FeatureDetailPage() {
         </div>
 
         {/* Decisions Section */}
-        <div className="space-y-4">
+        <div className=" w-1/3 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Decisions</h2>
             <Button size="sm" onClick={() => setDecisionDialogOpen(true)}>

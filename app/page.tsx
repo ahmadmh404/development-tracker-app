@@ -140,7 +140,7 @@ export default function DashboardPage() {
       </div>
 
       <ProjectDialog
-        open={true}
+        open={projectDialogOpen}
         onOpenChange={setProjectDialogOpen}
         onSave={(data) => {
           console.log("[v0] Creating new project:", data);
