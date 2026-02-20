@@ -3,17 +3,25 @@ import { Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import type { Project } from "@/lib/mockData";
-import { calculateProgress } from "@/lib/mockData";
+import { calculateProgress } from "@/app/actions/projects";
+import { Feature, features, Project, projects, Task, tasks } from "@/lib/db";
 
 interface ProjectSummaryProps {
-  project: Project;
+  project: Omit<
+    Project & {
+      features: Pick<
+        Feature & { tasks: Pick<Task, "status">[] },
+        "id" | "tasks"
+      >[];
+    },
+    "createdAt"
+  >;
 }
 
-export function ProjectSummary({ project }: ProjectSummaryProps) {
+export async function ProjectSummary({ project }: ProjectSummaryProps) {
   // Calculate overall progress
   const allTasks = project.features.flatMap((f) => f.tasks);
-  const progress = calculateProgress(allTasks);
+  const progress = await calculateProgress(project.id);
   const completedTasks = allTasks.filter((t) => t.status === "Done").length;
   const totalTasks = allTasks.length;
 

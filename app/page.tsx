@@ -1,6 +1,4 @@
-"use client";
-
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -21,7 +19,8 @@ import { ProjectSummary } from "@/components/project-summary";
 import { mockProjects } from "@/lib/mockData";
 import { ProjectDialog } from "@/components/projects/project-dialog";
 import { db, projects, tasks } from "@/lib/db";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
+import { cacheTag } from "next/cache";
 
 export default function DashboardPage() {
   return (
@@ -32,21 +31,6 @@ export default function DashboardPage() {
 }
 
 async function SuspendedDashboard() {
-  const [projectDialogOpen, setProjectDialogOpen] = useState(false);
-  const totalFeatures = mockProjects.reduce(
-    (sum, p) => sum + p.features.length,
-    0,
-  );
-  const allTasks = mockProjects.flatMap((p) =>
-    p.features.flatMap((f) => f.tasks),
-  );
-  const openTasks = allTasks.filter((t) => t.status !== "Done").length;
-  const activeProjects = mockProjects.filter(
-    (p) => p.status === "In Progress",
-  ).length;
-
-  const currentProject = mockProjects.find((p) => p.status === "In Progress");
-
   return (
     <div className="container mx-auto space-y-8 p-6 md:p-8">
       {/* Hero Section */}
@@ -60,68 +44,43 @@ async function SuspendedDashboard() {
       </div>
 
       {/* Quick Stats */}
+      <Suspense>
+        <DashboardStats />
+      </Suspense>
 
       {/* Current Project CTA */}
-      {currentProject && (
-        <Card className="border-primary/50 bg-primary/5">
-          <CardHeader>
-            <CardTitle>Continue Working</CardTitle>
-            <CardDescription>
-              Pick up where you left off with your active project
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-semibold">{currentProject.name}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {currentProject.description}
-                </p>
-              </div>
-              <Button asChild>
-                <Link href={`/projects/${currentProject.id}`}>
-                  Continue
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <Suspense>
+        <CurrentProjectCTA />
+      </Suspense>
 
       {/* All Projects */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold tracking-tight">All Projects</h2>
-          <Button onClick={() => setProjectDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Start New Project
-          </Button>
+          <ProjectDialog
+            onSave={(data) => {
+              console.log("[v0] Creating new project:", data);
+            }}
+          >
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Start New Project
+            </Button>
+          </ProjectDialog>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {mockProjects.map((project) => (
-            <ProjectSummary key={project.id} project={project} />
-          ))}
-        </div>
+        <Suspense>
+          <ProjectsSummaryList />
+        </Suspense>
       </div>
-
-      <ProjectDialog
-        open={projectDialogOpen}
-        onOpenChange={setProjectDialogOpen}
-        onSave={(data) => {
-          console.log("[v0] Creating new project:", data);
-        }}
-      />
     </div>
   );
 }
 
 // Dashboard Stats
-
 async function DashboardStats() {
   const [activeProjects, totalFeatures, allTasks] = await Promise.all([
-    await getActiveProjectsCount(),
+    await getActiveProjects(),
     await getTotalFeaturesCount(),
     await getOpenTasksCount(),
   ]);
@@ -138,7 +97,7 @@ async function DashboardStats() {
           <FolderKanban className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{activeProjects}</div>
+          <div className="text-2xl font-bold">{activeProjects.length}</div>
           <p className="text-xs text-muted-foreground">
             {mockProjects.length} total projects
           </p>
@@ -172,14 +131,70 @@ async function DashboardStats() {
   );
 }
 
-// Stats queries.
-async function getActiveProjectsCount() {
-  const activeProjects = await db.query.projects.findMany({
-    where: eq(projects.status, "In Progress"),
-    columns: { id: true },
-  });
+// Current Project CTA
+async function CurrentProjectCTA() {
+  const currentProject = (await getActiveProjects())?.at(0);
 
-  return activeProjects.length;
+  return (
+    currentProject && (
+      <Card className="border-primary/50 bg-primary/5">
+        <CardHeader>
+          <CardTitle>Continue Working</CardTitle>
+          <CardDescription>
+            Pick up where you left off with your active project
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold">{currentProject.name}</h3>
+              <p className="text-sm text-muted-foreground">
+                {currentProject.description}
+              </p>
+            </div>
+            <Button asChild>
+              <Link href={`/projects/${currentProject.id}`}>
+                Continue
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  );
+}
+
+// Projects Summary List
+async function ProjectsSummaryList() {
+  const projects = await getAllProjects();
+
+  if (projects.length === 0) {
+    return (
+      <div className="text-muted-foreground text-center my-4">
+        No project has started yet.
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {projects.map((project) => (
+        <ProjectSummary key={project.id} project={project} />
+      ))}
+    </div>
+  );
+}
+
+// Stats queries.
+async function getActiveProjects() {
+  "use cache";
+  cacheTag("active-projects");
+
+  return await db.query.projects.findMany({
+    where: eq(projects.status, "In Progress"),
+    columns: { id: true, name: true, description: true },
+  });
 }
 
 // Total features count.
@@ -198,4 +213,20 @@ async function getOpenTasksCount() {
   });
 
   return todos;
+}
+
+// get all projects
+async function getAllProjects() {
+  "use cache";
+  cacheTag("projects");
+
+  return await db.query.projects.findMany({
+    columns: { createdAt: false },
+    with: {
+      features: {
+        columns: { id: true },
+        with: { tasks: { columns: { status: true } } },
+      },
+    },
+  });
 }
