@@ -1,10 +1,12 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useTransition } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -14,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -21,40 +24,78 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { Feature, Priority, FeatureStatus } from "@/lib/mockData";
+import { Form } from "@/components/ui/form";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { Loader2 } from "lucide-react";
+import type { Feature } from "@/lib/mockData";
+import {
+  featureFormSchema,
+  featureStatuses,
+  priorities,
+  type FeatureFormInput,
+  transformFeatureFormToData,
+  transformFeatureDataToForm,
+} from "@/lib/validations";
+import { createFeature, updateFeature } from "@/app/actions/features";
 
 interface FeatureDialogProps {
   children: ReactNode;
   feature?: Feature;
+  projectId: string;
+  mode?: "create" | "edit";
+  onSuccess?: () => void;
 }
 
-export function FeatureDialog({ children, feature }: FeatureDialogProps) {
-  const isEdit = !!feature;
+export function FeatureDialog({
+  children,
+  feature,
+  projectId,
+  mode,
+  onSuccess,
+}: FeatureDialogProps) {
+  const isEdit = mode === "edit" || !!feature;
+  const [isPending, startTransition] = useTransition();
+  const [open, setOpen] = useState(false);
 
-  const [name, setName] = useState(feature?.name || "");
-  const [description, setDescription] = useState(feature?.description || "");
-  const [priority, setPriority] = useState<Priority>(
-    feature?.priority || "Medium",
-  );
-  const [status, setStatus] = useState<FeatureStatus>(
-    feature?.status || "To Do",
-  );
-  const [effortEstimate, setEffortEstimate] = useState(
-    feature?.effortEstimate || "",
-  );
+  const form = useForm<FeatureFormInput>({
+    resolver: zodResolver(featureFormSchema),
+    defaultValues: feature
+      ? transformFeatureDataToForm(feature)
+      : {
+          name: "",
+          description: "",
+          priority: "Medium",
+          status: "To Do",
+          effortEstimate: "",
+          projectId: projectId,
+        },
+  });
 
-  const handleSave = () => {
-    const data: Partial<Feature> = {
-      name,
-      description,
-      priority,
-      status,
-      effortEstimate,
-    };
-  };
+  function onSubmit(data: FeatureFormInput) {
+    startTransition(async () => {
+      try {
+        const formData = transformFeatureFormToData(data);
+        if (isEdit) {
+          await updateFeature(feature!.id, formData);
+          toast.success("Feature updated");
+        } else {
+          await createFeature(formData);
+          toast.success("Feature created");
+        }
+        setOpen(false);
+        form.reset();
+        onSuccess?.();
+      } catch (error) {
+        toast.error(
+          isEdit ? "Failed to update feature" : "Failed to create feature",
+        );
+        console.error(error);
+      }
+    });
+  }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -67,76 +108,127 @@ export function FeatureDialog({ children, feature }: FeatureDialogProps) {
               : "Add a new feature to your project"}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="feature-name">Feature Name</Label>
-            <Input
-              id="feature-name"
-              placeholder="e.g., User Authentication"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Feature Name</FieldLabel>
+                  <Input
+                    {...field}
+                    placeholder="e.g., User Authentication"
+                    className={fieldState.invalid ? "border-destructive" : ""}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="feature-description">Description</Label>
-            <Textarea
-              id="feature-description"
-              placeholder="Describe the feature..."
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+
+            <Controller
+              name="description"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Description</FieldLabel>
+                  <Textarea
+                    {...field}
+                    placeholder="Describe the feature..."
+                    rows={3}
+                    className={fieldState.invalid ? "border-destructive" : ""}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
             />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="priority">Priority</Label>
-              <Select
-                value={priority}
-                onValueChange={(v) => setPriority(v as Priority)}
-              >
-                <SelectTrigger id="priority">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="High">High</SelectItem>
-                  <SelectItem value="Medium">Medium</SelectItem>
-                  <SelectItem value="Low">Low</SelectItem>
-                </SelectContent>
-              </Select>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Controller
+                name="priority"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Priority</FieldLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger
+                        className={
+                          fieldState.invalid ? "border-destructive" : ""
+                        }
+                      >
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {priorities.map((priority) => (
+                          <SelectItem key={priority} value={priority}>
+                            {priority}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FieldError errors={[fieldState.error]} />
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="status"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Status</FieldLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger
+                        className={
+                          fieldState.invalid ? "border-destructive" : ""
+                        }
+                      >
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {featureStatuses.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FieldError errors={[fieldState.error]} />
+                  </Field>
+                )}
+              />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={status}
-                onValueChange={(v) => setStatus(v as FeatureStatus)}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="To Do">To Do</SelectItem>
-                  <SelectItem value="In Progress">In Progress</SelectItem>
-                  <SelectItem value="Done">Done</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="effort">Effort Estimate</Label>
-            <Input
-              id="effort"
-              placeholder="e.g., 8 hours"
-              value={effortEstimate}
-              onChange={(e) => setEffortEstimate(e.target.value)}
+
+            <Controller
+              name="effortEstimate"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Effort Estimate</FieldLabel>
+                  <Input
+                    {...field}
+                    placeholder="e.g., 8 hours"
+                    className={fieldState.invalid ? "border-destructive" : ""}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
             />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline">Cancel</Button>
-          <Button onClick={handleSave} disabled={!name}>
-            {isEdit ? "Save Changes" : "Create Feature"}
-          </Button>
-        </DialogFooter>
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="submit" disabled={isPending}>
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isEdit ? "Save Changes" : "Create Feature"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

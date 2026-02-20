@@ -3,49 +3,24 @@
 import { db, projects } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { projectSchema, type ProjectFormData } from "@/lib/validations";
 
-// ═══════════════════════════════════════════════════════════════
-// SCHEMAS
-// ═══════════════════════════════════════════════════════════════
-
-const projectSchema = z.object({
-  name: z.string().min(1, "Name is required").max(255),
-  description: z.string(),
-  status: z
-    .enum(["Planning", "In Progress", "Launched", "Archived"])
-    .optional(),
-  techStack: z.array(z.string()).optional(),
-});
+// Re-export schema for use in forms
+export { projectSchema, type ProjectFormData };
 
 // ═══════════════════════════════════════════════════════════════
 // READ OPERATIONS
 // ═══════════════════════════════════════════════════════════════
-
-export async function getProjects() {
-  return db.query.projects.findMany({
-    with: {
-      features: {
-        with: {
-          tasks: true,
-          decisions: true,
-        },
-      },
-    },
-    orderBy: (projects, { desc }) => [desc(projects.lastUpdated)],
-  });
-}
 
 export async function getProjectById(id: string) {
   return db.query.projects.findFirst({
     where: eq(projects.id, id),
     with: {
       features: {
-        columns: { status: true },
+        columns: {},
         with: { tasks: { columns: { status: true } } },
       },
     },
-    columns: { status: true },
   });
 }
 
@@ -53,7 +28,7 @@ export async function getProjectById(id: string) {
 // WRITE OPERATIONS
 // ═══════════════════════════════════════════════════════════════
 
-export async function createProject(data: z.infer<typeof projectSchema>) {
+export async function createProject(data: ProjectFormData) {
   const validated = projectSchema.parse(data);
 
   const [project] = await db
@@ -71,7 +46,7 @@ export async function createProject(data: z.infer<typeof projectSchema>) {
 
 export async function updateProject(
   id: string,
-  data: Partial<z.infer<typeof projectSchema>>,
+  data: Partial<ProjectFormData>,
 ) {
   const [project] = await db
     .update(projects)

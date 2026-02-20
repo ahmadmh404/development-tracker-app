@@ -30,7 +30,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/">
-                <FolderKanban className="h-6 w-6 text-sidebar-primary" />
+                <FolderKanban className="!size-[23px] text-sidebar-primary" />
                 <span className="text-lg font-semibold">Dev Tracker</span>
               </Link>
             </SidebarMenuButton>

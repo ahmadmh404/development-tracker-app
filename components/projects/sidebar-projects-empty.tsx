@@ -1,15 +1,21 @@
+"use client";
+
 import { FolderOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSidebar } from "../ui/sidebar";
 
 interface SidebarProjectsEmptyProps {
   className?: string;
 }
 
 export function SidebarProjectsEmpty({ className }: SidebarProjectsEmptyProps) {
+  const { open } = useSidebar();
+
   return (
     <div
       className={cn(
         "flex flex-col items-center justify-center px-3 py-6 text-center",
+        !open && "hidden",
         className,
       )}
     >

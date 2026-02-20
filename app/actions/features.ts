@@ -3,44 +3,19 @@
 import { db, features, projects } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { featureSchema, type FeatureFormData } from "@/lib/validations";
 
-// ═══════════════════════════════════════════════════════════════
-// SCHEMAS
-// ═══════════════════════════════════════════════════════════════
-
-const featureSchema = z.object({
-  name: z.string().min(1, "Name is required").max(255),
-  description: z.string(),
-  priority: z.enum(["High", "Medium", "Low"]).optional(),
-  status: z.enum(["To Do", "In Progress", "Done"]).optional(),
-  effortEstimate: z.string().optional(),
-  projectId: z.string().uuid(),
-});
+// Re-export schema for use in forms
+export { featureSchema, type FeatureFormData };
 
 // ═══════════════════════════════════════════════════════════════
 // READ OPERATIONS
 // ═══════════════════════════════════════════════════════════════
 
-export async function getFeatures() {
-  return db.query.features.findMany({
-    with: {
-      project: true,
-      tasks: true,
-      decisions: true,
-    },
-    orderBy: (features, { desc }) => [desc(features.createdAt)],
-  });
-}
-
 export async function getFeatureById(id: string) {
   return db.query.features.findFirst({
     where: eq(features.id, id),
-    with: {
-      project: true,
-      tasks: true,
-      decisions: true,
-    },
+    columns: { projectId: true },
   });
 }
 
@@ -59,7 +34,7 @@ export async function getFeaturesByProjectId(projectId: string) {
 // WRITE OPERATIONS
 // ═══════════════════════════════════════════════════════════════
 
-export async function createFeature(data: z.infer<typeof featureSchema>) {
+export async function createFeature(data: FeatureFormData) {
   const validated = featureSchema.parse(data);
 
   const [feature] = await db
@@ -85,7 +60,7 @@ export async function createFeature(data: z.infer<typeof featureSchema>) {
 
 export async function updateFeature(
   id: string,
-  data: Partial<z.infer<typeof featureSchema>>,
+  data: Partial<FeatureFormData>,
 ) {
   const existingFeature = await getFeatureById(id);
   if (!existingFeature) throw new Error("Feature not found");

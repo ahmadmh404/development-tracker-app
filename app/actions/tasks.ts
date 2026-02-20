@@ -3,46 +3,22 @@
 import { db, tasks, features, projects } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { taskSchema, type TaskFormData } from "@/lib/validations";
 
-// ═══════════════════════════════════════════════════════════════
-// SCHEMAS
-// ═══════════════════════════════════════════════════════════════
-
-const taskSchema = z.object({
-  title: z.string().min(1, "Title is required").max(255),
-  description: z.string(),
-  status: z.enum(["To Do", "In Progress", "Done"]).optional(),
-  dueDate: z.string().optional(),
-  effortEstimate: z.string().optional(),
-  featureId: z.string().uuid(),
-});
+// Re-export schema for use in forms
+export { taskSchema, type TaskFormData };
 
 // ═══════════════════════════════════════════════════════════════
 // READ OPERATIONS
 // ═══════════════════════════════════════════════════════════════
 
-export async function getTasks() {
-  return db.query.tasks.findMany({
-    with: {
-      feature: {
-        with: {
-          project: true,
-        },
-      },
-    },
-    orderBy: (tasks, { desc }) => [desc(tasks.createdAt)],
-  });
-}
-
 export async function getTaskById(id: string) {
   return db.query.tasks.findFirst({
     where: eq(tasks.id, id),
+    columns: { featureId: true },
     with: {
       feature: {
-        with: {
-          project: true,
-        },
+        columns: { projectId: true },
       },
     },
   });
@@ -59,7 +35,7 @@ export async function getTasksByFeatureId(featureId: string) {
 // WRITE OPERATIONS
 // ═══════════════════════════════════════════════════════════════
 
-export async function createTask(data: z.infer<typeof taskSchema>) {
+export async function createTask(data: TaskFormData) {
   const validated = taskSchema.parse(data);
 
   // Get feature to find project for revalidation
@@ -91,10 +67,7 @@ export async function createTask(data: z.infer<typeof taskSchema>) {
   return task;
 }
 
-export async function updateTask(
-  id: string,
-  data: Partial<z.infer<typeof taskSchema>>,
-) {
+export async function updateTask(id: string, data: Partial<TaskFormData>) {
   const existingTask = await getTaskById(id);
   if (!existingTask) throw new Error("Task not found");
 

@@ -3,48 +3,20 @@
 import { db, decisions, features, projects } from "@/lib/db";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { decisionSchema, type DecisionFormData } from "@/lib/validations";
 
-// ═══════════════════════════════════════════════════════════════
-// SCHEMAS
-// ═══════════════════════════════════════════════════════════════
-
-const decisionSchema = z.object({
-  text: z.string().min(1, "Decision text is required"),
-  date: z.string().optional(),
-  pros: z.array(z.string()).optional(),
-  cons: z.array(z.string()).optional(),
-  alternatives: z.string().optional(),
-  featureId: z.string().uuid(),
-});
+// Re-export schema for use in forms
+export { decisionSchema, type DecisionFormData };
 
 // ═══════════════════════════════════════════════════════════════
 // READ OPERATIONS
 // ═══════════════════════════════════════════════════════════════
 
-export async function getDecisions() {
-  return db.query.decisions.findMany({
-    with: {
-      feature: {
-        with: {
-          project: true,
-        },
-      },
-    },
-    orderBy: [desc(decisions.date)],
-  });
-}
-
 export async function getDecisionById(id: string) {
   return db.query.decisions.findFirst({
     where: eq(decisions.id, id),
-    with: {
-      feature: {
-        with: {
-          project: true,
-        },
-      },
-    },
+    columns: { id: true, featureId: true },
+    with: { feature: { columns: { projectId: true } } },
   });
 }
 
@@ -73,7 +45,7 @@ export async function getRecentDecisions(limit: number = 10) {
 // WRITE OPERATIONS
 // ═══════════════════════════════════════════════════════════════
 
-export async function createDecision(data: z.infer<typeof decisionSchema>) {
+export async function createDecision(data: DecisionFormData) {
   const validated = decisionSchema.parse(data);
 
   // Get feature to find project for revalidation
@@ -108,7 +80,7 @@ export async function createDecision(data: z.infer<typeof decisionSchema>) {
 
 export async function updateDecision(
   id: string,
-  data: Partial<z.infer<typeof decisionSchema>>,
+  data: Partial<DecisionFormData>,
 ) {
   const existingDecision = await getDecisionById(id);
   if (!existingDecision) throw new Error("Decision not found");
