@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { AppHeader } from "@/components/app-header";
-import "./globals.css";
+
+import "@/styles/globals.css";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -46,18 +48,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
       <body className="font-sans antialiased">
-        <div className="flex h-screen overflow-hidden">
-          {/* Desktop Sidebar - hidden on mobile */}
-          <aside className="hidden md:block">
-            <AppSidebar />
-          </aside>
-
-          {/* Main Content Area */}
-          <div className="flex flex-1 flex-col overflow-hidden">
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset>
             <AppHeader />
-            <main className="flex-1 overflow-y-auto">{children}</main>
-          </div>
-        </div>
+            <main className="flex-1 overflow-y-auto p-6">{children}</main>
+          </SidebarInset>
+        </SidebarProvider>
         <Analytics />
       </body>
     </html>
