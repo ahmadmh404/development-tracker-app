@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Plus } from "lucide-react";
+import { Plus, FolderOpen, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,10 +18,17 @@ import { EditableTitle } from "@/components/editable-title";
 import { db, decisions, features, projects } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { cacheTag } from "next/cache";
+import {
+  ProjectPageLoading,
+  FeatureListLoading,
+  DecisionListLoading,
+} from "@/components/loading";
+import { EmptyState } from "@/components/empty-state";
+import { ErrorState } from "@/components/error-state";
 
 export default function ProjectDetailPage(props: PageProps<"/projects/[id]">) {
   return (
-    <Suspense>
+    <Suspense fallback={<ProjectPageLoading />}>
       <SuspendedPage {...props} />
     </Suspense>
   );
@@ -34,7 +41,10 @@ async function SuspendedPage(props: PageProps<"/projects/[id]">) {
   if (!project) {
     return (
       <div className="container mx-auto p-6 md:p-8">
-        <p className="text-muted-foreground">Project not found</p>
+        <ErrorState
+          title="Project not found"
+          message="The project you're looking for doesn't exist or has been deleted."
+        />
       </div>
     );
   }
@@ -93,11 +103,11 @@ async function SuspendedPage(props: PageProps<"/projects/[id]">) {
           <TabsTrigger value="decisions">Recent Decisions</TabsTrigger>
         </TabsList>
 
-        <Suspense>
+        <Suspense fallback={<FeatureListLoading />}>
           <ProjectFeatures projectId={id} />
         </Suspense>
 
-        <Suspense>
+        <Suspense fallback={<DecisionListLoading />}>
           <ProjectDecisions projectId={project.id} />
         </Suspense>
       </Tabs>
@@ -115,7 +125,7 @@ async function ProjectFeatures({ projectId }: { projectId: string }) {
           {features.length} features in total
         </p>
 
-        <FeatureDialog onSave={(data) => {}}>
+        <FeatureDialog>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Add Feature
@@ -134,11 +144,11 @@ async function ProjectDecisions({ projectId }: { projectId: string }) {
   return (
     <TabsContent value="decisions" className="space-y-4">
       {projectDecisions.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border p-12 text-center">
-          <p className="text-muted-foreground">
-            No decisions logged yet for this project.
-          </p>
-        </div>
+        <EmptyState
+          icon={Lightbulb}
+          title="No decisions yet"
+          description="Decisions made during development will appear here."
+        />
       ) : (
         <div className="space-y-4">
           {projectDecisions.map((decision) => (

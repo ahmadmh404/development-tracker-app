@@ -25,15 +25,10 @@ import type { Feature, Priority, FeatureStatus } from "@/lib/mockData";
 
 interface FeatureDialogProps {
   children: ReactNode;
-  feature?: Feature; // If provided, edit mode; otherwise, create mode
-  onSave: (data: Partial<Feature>) => void;
+  feature?: Feature;
 }
 
-export function FeatureDialog({
-  children,
-  feature,
-  onSave,
-}: FeatureDialogProps) {
+export function FeatureDialog({ children, feature }: FeatureDialogProps) {
   const isEdit = !!feature;
 
   const [name, setName] = useState(feature?.name || "");
@@ -56,7 +51,6 @@ export function FeatureDialog({
       status,
       effortEstimate,
     };
-    onSave(data);
   };
 
   return (

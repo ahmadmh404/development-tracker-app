@@ -26,11 +26,10 @@ import type { Task, TaskStatus } from "@/lib/mockData";
 
 interface TaskDialogProps {
   children: ReactNode;
-  task?: Task; // If provided, edit mode; otherwise, create mode
-  onSave: (data: Partial<Task>) => void;
+  task?: Task;
 }
 
-export function TaskDialog({ children, task, onSave }: TaskDialogProps) {
+export function TaskDialog({ children, task }: TaskDialogProps) {
   const isEdit = !!task;
 
   const [title, setTitle] = useState(task?.title || "");
@@ -49,7 +48,6 @@ export function TaskDialog({ children, task, onSave }: TaskDialogProps) {
       dueDate,
       effortEstimate,
     };
-    onSave(data);
   };
 
   return (

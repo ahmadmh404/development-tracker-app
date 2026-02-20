@@ -18,15 +18,10 @@ import { DialogClose } from "@radix-ui/react-dialog";
 
 interface DecisionDialogProps {
   children: ReactNode;
-  decision?: Decision; // If provided, edit mode; otherwise, create mode
-  onSave: (data: Partial<Decision>) => void;
+  decision?: Decision;
 }
 
-export function DecisionDialog({
-  children,
-  decision,
-  onSave,
-}: DecisionDialogProps) {
+export function DecisionDialog({ children, decision }: DecisionDialogProps) {
   const isEdit = !!decision;
 
   const [decisionText, setDecisionText] = useState(decision?.text || "");
@@ -49,7 +44,6 @@ export function DecisionDialog({
         .filter(Boolean),
       alternatives,
     };
-    onSave(data);
   };
 
   return (

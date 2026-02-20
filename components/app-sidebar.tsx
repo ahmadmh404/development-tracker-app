@@ -5,14 +5,21 @@ import { usePathname } from "next/navigation";
 import { FolderKanban, Plus, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useSidebar } from "@/contexts/sidebar-context";
 import { mockProjects } from "@/lib/mockData";
 
 export function AppSidebar() {
   const pathname = usePathname();
   const activeProjectId = "1"; // Mock: first project is active
+  const { isOpen } = useSidebar();
 
   return (
-    <div className="flex h-full w-64 flex-col border-r border-border bg-sidebar">
+    <div
+      className={cn(
+        "flex h-full flex-col border-r border-border bg-sidebar transition-all duration-300",
+        isOpen ? "w-64" : "w-0 overflow-hidden",
+      )}
+    >
       {/* Logo/Title */}
       <div className="flex h-16 items-center border-b border-sidebar-border px-6">
         <Link href="/" className="flex items-center gap-2">

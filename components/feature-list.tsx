@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, Trash2, Layers } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import {
 import { FeatureStatus, Priority } from "@/lib/mockData";
 import { Feature, tasks } from "@/lib/db";
 import { calculateProgress } from "@/app/actions/projects";
+import { EmptyState } from "@/components/empty-state";
 
 interface FeatureListProps {
   features: Omit<
@@ -53,11 +54,11 @@ function getStatusColor(status: FeatureStatus) {
 export function FeatureList({ features, projectId }: FeatureListProps) {
   if (features.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-border p-12 text-center">
-        <p className="text-muted-foreground">
-          No features yet. Add your first feature to get started.
-        </p>
-      </div>
+      <EmptyState
+        icon={Layers}
+        title="No features yet"
+        description="Add your first feature to start tracking progress."
+      />
     );
   }
 
@@ -74,7 +75,6 @@ export function FeatureList({ features, projectId }: FeatureListProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          w
           {features.map((feature) => {
             const progress = calculateProgress(projectId);
             const completedTasks = feature.tasks.filter(

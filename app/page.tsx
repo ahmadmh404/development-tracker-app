@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Clock,
   Plus,
+  FolderOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,12 @@ import { ProjectDialog } from "@/components/projects/project-dialog";
 import { db, projects, tasks } from "@/lib/db";
 import { desc, eq } from "drizzle-orm";
 import { cacheTag } from "next/cache";
+import {
+  DashboardStatsLoading,
+  CurrentProjectCTALoading,
+  ProjectsSummaryListLoading,
+} from "@/components/loading";
+import { EmptyState } from "@/components/empty-state";
 
 export default function DashboardPage() {
   return (
@@ -44,12 +51,12 @@ async function SuspendedDashboard() {
       </div>
 
       {/* Quick Stats */}
-      <Suspense>
+      <Suspense fallback={<DashboardStatsLoading />}>
         <DashboardStats />
       </Suspense>
 
       {/* Current Project CTA */}
-      <Suspense>
+      <Suspense fallback={<CurrentProjectCTALoading />}>
         <CurrentProjectCTA />
       </Suspense>
 
@@ -57,11 +64,7 @@ async function SuspendedDashboard() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold tracking-tight">All Projects</h2>
-          <ProjectDialog
-            onSave={(data) => {
-              console.log("[v0] Creating new project:", data);
-            }}
-          >
+          <ProjectDialog>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               Start New Project
@@ -69,7 +72,7 @@ async function SuspendedDashboard() {
           </ProjectDialog>
         </div>
 
-        <Suspense>
+        <Suspense fallback={<ProjectsSummaryListLoading />}>
           <ProjectsSummaryList />
         </Suspense>
       </div>
@@ -171,9 +174,11 @@ async function ProjectsSummaryList() {
 
   if (projects.length === 0) {
     return (
-      <div className="text-muted-foreground text-center my-4">
-        No project has started yet.
-      </div>
+      <EmptyState
+        icon={FolderOpen}
+        title="No projects yet"
+        description="Start your first project to begin tracking your development work."
+      />
     );
   }
 

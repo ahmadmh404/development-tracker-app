@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Plus } from "lucide-react";
+import { Plus, CheckSquare, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -24,12 +24,19 @@ import { db, decisions, features, projects, tasks } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { EditableTitle } from "@/components/editable-title";
 import { cn } from "@/lib/utils";
+import {
+  FeaturePageLoading,
+  TasksLoading,
+  DecisionsLoading,
+} from "@/components/loading";
+import { EmptyState } from "@/components/empty-state";
+import { ErrorState } from "@/components/error-state";
 
 export default function FeatureDetailPage(
   props: PageProps<"/projects/[id]/features/[featureId]">,
 ) {
   return (
-    <Suspense>
+    <Suspense fallback={<FeaturePageLoading />}>
       <SuspendedPage {...props} />
     </Suspense>
   );
@@ -45,103 +52,108 @@ async function SuspendedPage(
   if (!project || !feature) {
     return (
       <div className="container mx-auto p-6 md:p-8">
-        <p className="text-muted-foreground">Feature not found</p>
+        <ErrorState
+          title="Feature not found"
+          message="The feature you're looking for doesn't exist or has been deleted."
+        />
       </div>
     );
   }
 
-  <div className="container mx-auto space-y-6 p-6 md:p-8">
-    {/* Breadcrumb */}
-    <AppBreadcrumb
-      items={[
-        { label: "Dashboard", href: "/" },
-        { label: project.name, href: `/projects/${project.id}` },
-        { label: feature.name },
-      ]}
-    />
+  return (
+    <div className="container mx-auto space-y-6 p-6 md:p-8">
+      {/* Breadcrumb */}
+      <AppBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/" },
+          { label: project.name, href: `/projects/${project.id}` },
+          { label: feature.name },
+        ]}
+      />
 
-    {/* Feature Header */}
-    <div className="space-y-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex-1 space-y-2">
-          <EditableTitle
-            value={feature.name}
-            onChange={(name) => {}}
-            isOpen={false}
-            setIsOpen={(open) => console.log("is open")}
-          />
-          <p className="text-pretty text-muted-foreground">
-            {feature.description}
-          </p>
+      {/* Feature Header */}
+      <div className="space-y-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex-1 space-y-2">
+            <EditableTitle
+              value={feature.name}
+              onChange={(name) => {}}
+              isOpen={false}
+              setIsOpen={(open) => console.log("is open")}
+            />
+            <p className="text-pretty text-muted-foreground">
+              {feature.description}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Filtering with search params */}
+            <Select
+              value={feature.priority}
+              // onValueChange={(v) => setPriority(v as Priority)}
+            >
+              <SelectTrigger className="w-[130px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="High">High</SelectItem>
+                <SelectItem value="Medium">Medium</SelectItem>
+                <SelectItem value="Low">Low</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={feature.status}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="To Do">To Do</SelectItem>
+                <SelectItem value="In Progress">In Progress</SelectItem>
+                <SelectItem value="Done">Done</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Filtering with search params */}
-          <Select
-            value={feature.priority}
-            // onValueChange={(v) => setPriority(v as Priority)}
-          >
-            <SelectTrigger className="w-[130px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="High">High</SelectItem>
-              <SelectItem value="Medium">Medium</SelectItem>
-              <SelectItem value="Low">Low</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={feature.status}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="To Do">To Do</SelectItem>
-              <SelectItem value="In Progress">In Progress</SelectItem>
-              <SelectItem value="Done">Done</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline">Estimate: {feature.effortEstimate}</Badge>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Badge variant="outline">Estimate: {feature.effortEstimate}</Badge>
+      {/* Main Content - Tasks and Decisions */}
+      {/* Mobile: Flex column layout */}
+      <div className="flex flex-col gap-6 lg:hidden">
+        {/* Tasks Section */}
+        <FeatureTasks featureId={feature.id} className="space-y-4" />
+
+        {/* Decisions Section */}
+        <FeatureDecisions featureId={feature.id} className="space-y-4" />
+      </div>
+
+      {/* Desktop: Resizable panels */}
+      <div className="hidden lg:block">
+        <ResizablePanelGroup direction="horizontal" className="min-h-[600px]">
+          {/* Tasks Panel */}
+          <ResizablePanel defaultSize={55} minSize={30}>
+            <FeatureTasks
+              featureId={featureId}
+              className="h-full space-y-4 pr-4"
+            />
+          </ResizablePanel>
+
+          <ResizableHandle withHandle />
+
+          {/* Decisions Panel */}
+          <ResizablePanel defaultSize={45} minSize={30}>
+            <FeatureDecisions
+              featureId={feature.id}
+              className="h-full space-y-4 pl-4"
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </div>
-
-    {/* Main Content - Tasks and Decisions */}
-    {/* Mobile: Flex column layout */}
-    <div className="flex flex-col gap-6 lg:hidden">
-      {/* Tasks Section */}
-      <FeatureTasks featureId={feature.id} className="space-y-4" />
-
-      {/* Decisions Section */}
-      <FeatureDecisions featureId={feature.id} className="space-y-4" />
-    </div>
-
-    {/* Desktop: Resizable panels */}
-    <div className="hidden lg:block">
-      <ResizablePanelGroup direction="horizontal" className="min-h-[600px]">
-        {/* Tasks Panel */}
-        <ResizablePanel defaultSize={55} minSize={30}>
-          <FeatureTasks
-            featureId={featureId}
-            className="h-full space-y-4 pr-4"
-          />
-        </ResizablePanel>
-
-        <ResizableHandle withHandle />
-
-        {/* Decisions Panel */}
-        <ResizablePanel defaultSize={45} minSize={30}>
-          <FeatureDecisions
-            featureId={feature.id}
-            className="h-full space-y-4 pl-4"
-          />
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </div>
-  </div>;
+  );
 }
 
 async function FeatureTasks({
@@ -160,11 +172,7 @@ async function FeatureTasks({
     <div className={cn("", className)}>
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Tasks</h2>
-        <TaskDialog
-          onSave={(data) => {
-            console.log("[v0] Creating new task:", data);
-          }}
-        >
+        <TaskDialog>
           <Button size="sm">
             <Plus className="mr-2 h-4 w-4" />
             Add Task
@@ -184,9 +192,11 @@ async function FeatureTasks({
           </div>
           <div className="space-y-2">
             {todoTasks.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-border p-4 text-center">
-                <p className="text-xs text-muted-foreground">No tasks</p>
-              </div>
+              <EmptyState
+                title="No tasks"
+                description="Add your first task"
+                className="p-4"
+              />
             ) : (
               todoTasks.map((task) => <TaskItem key={task.id} task={task} />)
             )}
@@ -203,9 +213,11 @@ async function FeatureTasks({
           </div>
           <div className="space-y-2">
             {inProgressTasks.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-border p-4 text-center">
-                <p className="text-xs text-muted-foreground">No tasks</p>
-              </div>
+              <EmptyState
+                title="No tasks"
+                description="Tasks in progress will appear here"
+                className="p-4"
+              />
             ) : (
               inProgressTasks.map((task) => (
                 <TaskItem key={task.id} task={task} />
@@ -224,9 +236,11 @@ async function FeatureTasks({
           </div>
           <div className="space-y-2">
             {doneTasks.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-border p-4 text-center">
-                <p className="text-xs text-muted-foreground">No tasks</p>
-              </div>
+              <EmptyState
+                title="No tasks"
+                description="Completed tasks will appear here"
+                className="p-4"
+              />
             ) : (
               doneTasks.map((task) => <TaskItem key={task.id} task={task} />)
             )}
@@ -250,11 +264,7 @@ async function FeatureDecisions({
     <div className={cn("", className)}>
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Decisions</h2>
-        <DecisionDialog
-          onSave={(data) => {
-            console.log("[v0] Logging new decision:", data);
-          }}
-        >
+        <DecisionDialog>
           <Button size="sm">
             <Plus className="mr-2 h-4 w-4" />
             Log Decision
@@ -264,11 +274,11 @@ async function FeatureDecisions({
 
       <div className="space-y-4">
         {decisions.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border p-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              No decisions logged yet for this feature.
-            </p>
-          </div>
+          <EmptyState
+            icon={Lightbulb}
+            title="No decisions yet"
+            description="Log decisions made during development."
+          />
         ) : (
           decisions.map((decision) => (
             <DecisionCard key={decision.id} decision={decision} />

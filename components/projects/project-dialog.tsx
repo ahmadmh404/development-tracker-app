@@ -26,15 +26,10 @@ import type { Project, ProjectStatus } from "@/lib/mockData";
 
 interface ProjectDialogProps {
   children: ReactNode;
-  project?: Project; // If provided, edit mode; otherwise, create mode
-  onSave: (data: Partial<Project>) => void;
+  project?: Project;
 }
 
-export function ProjectDialog({
-  children,
-  project,
-  onSave,
-}: ProjectDialogProps) {
+export function ProjectDialog({ children, project }: ProjectDialogProps) {
   const isEdit = !!project;
 
   const [name, setName] = useState(project?.name || "");
@@ -56,7 +51,6 @@ export function ProjectDialog({
         .map((s) => s.trim())
         .filter(Boolean),
     };
-    onSave(data);
   };
 
   return (
