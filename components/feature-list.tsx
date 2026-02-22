@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { Edit2, Trash2, Layers } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

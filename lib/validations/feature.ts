@@ -11,7 +11,6 @@ export const featureSchema = z.object({
   priority: z.enum(priorities).optional(),
   status: z.enum(featureStatuses).optional(),
   effortEstimate: z.string().nullable().optional(),
-  projectId: z.string().uuid(),
 });
 
 // Form input schema (same as base for features - no transformations needed)
@@ -21,7 +20,6 @@ export const featureFormSchema = z.object({
   priority: z.enum(priorities).optional(),
   status: z.enum(featureStatuses).optional(),
   effortEstimate: z.string().optional(),
-  projectId: z.string().uuid(),
 });
 
 // Types

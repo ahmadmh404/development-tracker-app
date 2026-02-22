@@ -42,12 +42,15 @@ export async function getRecentDecisions(limit: number = 10) {
 // WRITE OPERATIONS
 // ═══════════════════════════════════════════════════════════════
 
-export async function createDecision(data: DecisionFormData) {
+export async function createDecision(
+  featureId: string,
+  data: DecisionFormData,
+) {
   const validated = decisionSchema.parse(data);
 
   // Get feature to find project for revalidation
   const feature = await db.query.features.findFirst({
-    where: eq(features.id, validated.featureId),
+    where: eq(features.id, featureId),
   });
   if (!feature) throw new Error("Feature not found");
 
@@ -55,6 +58,7 @@ export async function createDecision(data: DecisionFormData) {
     .insert(decisions)
     .values({
       ...validated,
+      featureId,
       date: validated.date ? new Date(validated.date) : new Date(),
       pros: validated.pros ?? [],
       cons: validated.cons ?? [],
@@ -69,9 +73,7 @@ export async function createDecision(data: DecisionFormData) {
     .where(eq(projects.id, feature.projectId));
 
   revalidatePath(`/projects/${feature.projectId}`);
-  revalidatePath(
-    `/projects/${feature.projectId}/features/${validated.featureId}`,
-  );
+  revalidatePath(`/projects/${feature.projectId}/features/${featureId}`);
   return decision;
 }
 

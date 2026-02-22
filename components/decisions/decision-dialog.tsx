@@ -3,7 +3,6 @@
 import { ReactNode, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +29,7 @@ import { Loader2 } from "lucide-react";
 import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field";
 
 interface DecisionDialogProps {
+  featureId: string;
   children: ReactNode;
   decision?: Decision;
   mode?: "create" | "edit";
@@ -37,6 +37,7 @@ interface DecisionDialogProps {
 }
 
 export function DecisionDialog({
+  featureId,
   children,
   decision,
   mode,
@@ -67,7 +68,7 @@ export function DecisionDialog({
           await updateDecision(decision.id, formData);
           toast.success("Decision updated");
         } else {
-          await createDecision(formData);
+          await createDecision(featureId, formData);
           toast.success("Decision created");
         }
         setOpen(false);

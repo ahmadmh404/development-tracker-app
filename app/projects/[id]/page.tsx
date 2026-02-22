@@ -120,7 +120,7 @@ async function ProjectFeatures({ projectId }: { projectId: string }) {
           {features.length} features in total
         </p>
 
-        <FeatureDialog>
+        <FeatureDialog projectId={projectId}>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Add Feature

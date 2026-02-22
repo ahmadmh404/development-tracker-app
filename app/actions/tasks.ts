@@ -32,12 +32,12 @@ export async function getTasksByFeatureId(featureId: string) {
 // WRITE OPERATIONS
 // ═══════════════════════════════════════════════════════════════
 
-export async function createTask(data: TaskFormData) {
+export async function createTask(featureId: string, data: TaskFormData) {
   const validated = taskSchema.parse(data);
 
   // Get feature to find project for revalidation
   const feature = await db.query.features.findFirst({
-    where: eq(features.id, validated.featureId),
+    where: eq(features.id, featureId),
   });
   if (!feature) throw new Error("Feature not found");
 
@@ -45,6 +45,7 @@ export async function createTask(data: TaskFormData) {
     .insert(tasks)
     .values({
       ...validated,
+      featureId,
       status: validated.status ?? "To Do",
       dueDate: validated.dueDate ? new Date(validated.dueDate) : null,
       effortEstimate: validated.effortEstimate ?? null,
@@ -58,9 +59,7 @@ export async function createTask(data: TaskFormData) {
     .where(eq(projects.id, feature.projectId));
 
   revalidatePath(`/projects/${feature.projectId}`);
-  revalidatePath(
-    `/projects/${feature.projectId}/features/${validated.featureId}`,
-  );
+  revalidatePath(`/projects/${feature.projectId}/features/${featureId}`);
   return task;
 }
 

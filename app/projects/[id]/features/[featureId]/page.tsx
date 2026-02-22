@@ -75,12 +75,7 @@ async function SuspendedPage(
       <div className="space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1 space-y-2">
-            <EditableTitle
-              value={feature.name}
-              onChange={(name) => {}}
-              isOpen={false}
-              setIsOpen={(open) => console.log("is open")}
-            />
+            <EditableTitle value={feature.name} />
             <p className="text-pretty text-muted-foreground">
               {feature.description}
             </p>
@@ -172,7 +167,7 @@ async function FeatureTasks({
     <div className={cn("", className)}>
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Tasks</h2>
-        <TaskDialog>
+        <TaskDialog featureId={featureId}>
           <Button size="sm">
             <Plus className="mr-2 h-4 w-4" />
             Add Task
@@ -264,7 +259,7 @@ async function FeatureDecisions({
     <div className={cn("", className)}>
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Decisions</h2>
-        <DecisionDialog>
+        <DecisionDialog featureId={featureId}>
           <Button size="sm">
             <Plus className="mr-2 h-4 w-4" />
             Log Decision

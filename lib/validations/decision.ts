@@ -7,7 +7,6 @@ export const decisionSchema = z.object({
   pros: z.array(z.string()).optional(),
   cons: z.array(z.string()).optional(),
   alternatives: z.string().optional(),
-  featureId: z.string().uuid(),
 });
 
 // Form input schema (pros/cons as newline-separated strings)
@@ -17,7 +16,6 @@ export const decisionFormSchema = z.object({
   pros: z.string().optional(), // Newline-separated in form
   cons: z.string().optional(), // Newline-separated in form
   alternatives: z.string().optional(),
-  featureId: z.string().uuid(),
 });
 
 // Types

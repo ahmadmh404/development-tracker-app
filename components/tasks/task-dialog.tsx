@@ -39,6 +39,7 @@ import { Loader2 } from "lucide-react";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 
 interface TaskDialogProps {
+  featureId: string;
   children: ReactNode;
   task?: Task;
   mode?: "create" | "edit";
@@ -46,6 +47,7 @@ interface TaskDialogProps {
 }
 
 export function TaskDialog({
+  featureId,
   children,
   task,
   mode,
@@ -76,7 +78,7 @@ export function TaskDialog({
           await updateTask(task.id, formData);
           toast.success("Project updated");
         } else {
-          await createTask(formData);
+          await createTask(featureId, formData);
           toast.success("Project created");
         }
         setOpen(false);

@@ -31,7 +31,7 @@ export async function getFeaturesByProjectId(projectId: string) {
 // WRITE OPERATIONS
 // ═══════════════════════════════════════════════════════════════
 
-export async function createFeature(data: FeatureFormData) {
+export async function createFeature(projectId: string, data: FeatureFormData) {
   const validated = featureSchema.parse(data);
 
   const [feature] = await db
@@ -41,6 +41,7 @@ export async function createFeature(data: FeatureFormData) {
       priority: validated.priority ?? "Medium",
       status: validated.status ?? "To Do",
       effortEstimate: validated.effortEstimate ?? null,
+      projectId,
     })
     .returning();
 
@@ -48,10 +49,10 @@ export async function createFeature(data: FeatureFormData) {
   await db
     .update(projects)
     .set({ lastUpdated: new Date() })
-    .where(eq(projects.id, validated.projectId));
+    .where(eq(projects.id, projectId));
 
-  revalidatePath(`/projects/${validated.projectId}`);
-  revalidatePath(`/projects/${validated.projectId}/features`);
+  revalidatePath(`/projects/${projectId}`);
+  revalidatePath(`/projects/${projectId}/features`);
   return feature;
 }
 

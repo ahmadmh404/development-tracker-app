@@ -57,6 +57,8 @@ export function FeatureDialog({
   const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
 
+  console.log("projectId: ", projectId);
+
   const form = useForm<FeatureFormInput>({
     resolver: zodResolver(featureFormSchema),
     defaultValues: feature
@@ -67,7 +69,6 @@ export function FeatureDialog({
           priority: "Medium",
           status: "To Do",
           effortEstimate: "",
-          projectId: projectId,
         },
   });
 
@@ -75,11 +76,12 @@ export function FeatureDialog({
     startTransition(async () => {
       try {
         const formData = transformFeatureFormToData(data);
+        console.log("formData: ", formData);
         if (isEdit) {
           await updateFeature(feature!.id, formData);
           toast.success("Feature updated");
         } else {
-          await createFeature(formData);
+          await createFeature(projectId, formData);
           toast.success("Feature created");
         }
         setOpen(false);
