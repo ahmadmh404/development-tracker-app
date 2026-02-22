@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { Decision } from "@/lib/mockData";
+import type { Decision } from "@/types";
 import { DialogClose } from "@radix-ui/react-dialog";
 import {
   DecisionFormInput,
@@ -127,6 +127,7 @@ export function DecisionDialog({
                   <FieldLabel>Pros</FieldLabel>
                   <Textarea
                     {...field}
+                    value={field.value ?? ""}
                     placeholder="List benefits (one per line)..."
                     className={fieldState.invalid ? "border-destructive" : ""}
                   />

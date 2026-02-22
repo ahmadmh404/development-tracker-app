@@ -27,7 +27,6 @@ import {
 import { Form } from "@/components/ui/form";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Loader2 } from "lucide-react";
-import type { Feature } from "@/lib/mockData";
 import {
   featureFormSchema,
   featureStatuses,
@@ -37,10 +36,11 @@ import {
   transformFeatureDataToForm,
 } from "@/lib/validations";
 import { createFeature, updateFeature } from "@/app/actions/features";
+import { Feature } from "@/types";
 
 interface FeatureDialogProps {
   children: ReactNode;
-  feature?: Feature;
+  feature?: Omit<Feature, "createdAt">;
   projectId: string;
   mode?: "create" | "edit";
   onSuccess?: () => void;
@@ -56,8 +56,6 @@ export function FeatureDialog({
   const isEdit = mode === "edit" || !!feature;
   const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
-
-  console.log("projectId: ", projectId);
 
   const form = useForm<FeatureFormInput>({
     resolver: zodResolver(featureFormSchema),

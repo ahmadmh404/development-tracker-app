@@ -21,7 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { Task } from "@/lib/mockData";
+import type { Task } from "@/types";
 import { Controller, useForm } from "react-hook-form";
 import {
   TaskFormInput,
@@ -34,7 +34,6 @@ import { createTask, updateTask } from "@/app/actions/tasks";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "../ui/form";
-import { Loader2 } from "lucide-react";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 
 interface TaskDialogProps {
@@ -55,6 +54,8 @@ export function TaskDialog({
   const isEdit = mode === "edit" || !!task;
   const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
+
+  console.log("task: ", task);
 
   const form = useForm<TaskFormInput>({
     resolver: zodResolver(taskFormSchema),
@@ -93,7 +94,7 @@ export function TaskDialog({
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="overflow-y-hidden">
         <DialogHeader>

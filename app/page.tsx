@@ -17,7 +17,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ProjectSummary } from "@/components/project-summary";
-import { mockProjects } from "@/lib/mockData";
 import { ProjectDialog } from "@/components/projects/project-dialog";
 import { db, projects, tasks } from "@/lib/db";
 import { desc, eq } from "drizzle-orm";
@@ -82,11 +81,15 @@ async function SuspendedDashboard() {
 
 // Dashboard Stats
 async function DashboardStats() {
-  const [activeProjects, totalFeatures, allTasks] = await Promise.all([
-    await getActiveProjects(),
+  const [totalProject, totalFeatures, allTasks] = await Promise.all([
+    await getAllProjects(),
     await getTotalFeaturesCount(),
     await getOpenTasksCount(),
   ]);
+
+  const activeProjects = totalProject.filter(
+    (pr) => pr.status === "In Progress",
+  );
 
   const openTasks = allTasks.filter(
     (todo) => todo.status === "In Progress",
@@ -102,7 +105,7 @@ async function DashboardStats() {
         <CardContent>
           <div className="text-2xl font-bold">{activeProjects.length}</div>
           <p className="text-xs text-muted-foreground">
-            {mockProjects.length} total projects
+            {totalProject.length} total projects
           </p>
         </CardContent>
       </Card>
@@ -194,10 +197,9 @@ async function ProjectsSummaryList() {
 // Stats queries.
 async function getActiveProjects() {
   "use cache";
-  cacheTag("active-projects");
+  cacheTag("projects");
 
   return await db.query.projects.findMany({
-    where: eq(projects.status, "In Progress"),
     columns: { id: true, name: true, description: true },
   });
 }

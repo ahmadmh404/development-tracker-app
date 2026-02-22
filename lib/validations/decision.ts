@@ -3,10 +3,10 @@ import { z } from "zod";
 // Base schema for server actions (pros/cons as arrays)
 export const decisionSchema = z.object({
   text: z.string().min(1, "Decision text is required"),
-  date: z.string().optional(), // ISO date string
-  pros: z.array(z.string()).optional(),
-  cons: z.array(z.string()).optional(),
-  alternatives: z.string().optional(),
+  date: z.date().nullable(),
+  pros: z.array(z.string()).nullable(),
+  cons: z.array(z.string()).nullable(),
+  alternatives: z.string().nullable(),
 });
 
 // Form input schema (pros/cons as newline-separated strings)
@@ -40,6 +40,8 @@ export function transformDecisionFormToData(
           .map((s) => s.trim())
           .filter(Boolean)
       : [],
+    alternatives: data.alternatives ?? null,
+    date: data.date ? new Date(data.date) : null,
   };
 }
 
@@ -51,6 +53,7 @@ export function transformDecisionDataToForm(
     ...data,
     pros: data.pros?.join("\n"),
     cons: data.cons?.join("\n"),
+    alternatives: data.alternatives || undefined,
     date: data.date
       ? new Date(data.date).toISOString().split("T")[0]
       : undefined,

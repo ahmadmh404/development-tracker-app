@@ -10,10 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FeatureStatus, Priority } from "@/lib/mockData";
+import { FeatureStatus, Priority } from "@/types";
 import { Feature, tasks } from "@/lib/db";
 import { calculateProgress } from "@/app/actions/projects";
 import { EmptyState } from "@/components/empty-state";
+import { FeatureDialog } from "./features/feature-dialog";
 
 interface FeatureListProps {
   features: Omit<
@@ -119,10 +120,12 @@ export function FeatureList({ features, projectId }: FeatureListProps) {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Edit2 className="h-4 w-4" />
-                      <span className="sr-only">Edit feature</span>
-                    </Button>
+                    <FeatureDialog projectId={projectId} feature={feature}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Edit2 className="h-4 w-4" />
+                        <span className="sr-only">Edit feature</span>
+                      </Button>
+                    </FeatureDialog>
                     <Button
                       variant="ghost"
                       size="icon"

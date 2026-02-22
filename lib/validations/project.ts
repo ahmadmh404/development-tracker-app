@@ -12,8 +12,8 @@ export const projectStatuses = [
 export const projectSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
   description: z.string().default(""),
-  status: z.enum(projectStatuses).optional(),
-  techStack: z.array(z.string()).optional(),
+  status: z.enum(projectStatuses).nullable(),
+  techStack: z.array(z.string()).nullable(),
 });
 
 // Form input schema (techStack as comma-separated string for user input)
@@ -34,6 +34,7 @@ export function transformProjectFormToData(
 ): ProjectFormData {
   return {
     ...data,
+    status: data.status ?? null,
     techStack: data.techStack
       ? data.techStack
           .split(",")
@@ -49,6 +50,7 @@ export function transformProjectDataToForm(
 ): Partial<ProjectFormInput> {
   return {
     ...data,
+    status: data.status || undefined,
     techStack: data.techStack?.join(", "),
   };
 }

@@ -27,7 +27,7 @@ import {
 import { Form } from "@/components/ui/form";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Loader2 } from "lucide-react";
-import type { Project } from "@/lib/mockData";
+import type { Project } from "@/types";
 import {
   projectFormSchema,
   projectStatuses,

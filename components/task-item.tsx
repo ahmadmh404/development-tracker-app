@@ -6,14 +6,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import type { Task } from "@/lib/mockData";
 import { tasks } from "@/lib/db";
+import { TaskDialog } from "./tasks/task-dialog";
 
 interface TaskItemProps {
+  featureId: string;
   task: Omit<typeof tasks.$inferSelect, "createdAt">;
 }
 
-export function TaskItem({ task }: TaskItemProps) {
+export function TaskItem({ featureId, task }: TaskItemProps) {
   const [isDone, setIsDone] = useState(task.status === "Done");
 
   return (
@@ -39,10 +40,12 @@ export function TaskItem({ task }: TaskItemProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Edit2 className="h-4 w-4" />
-              <span className="sr-only">Edit task</span>
-            </Button>
+            <TaskDialog featureId={featureId} task={task}>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Edit2 className="h-4 w-4" />
+                <span className="sr-only">Edit task</span>
+              </Button>
+            </TaskDialog>
             <Button
               variant="ghost"
               size="icon"

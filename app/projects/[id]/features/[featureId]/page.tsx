@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Plus, CheckSquare, Lightbulb } from "lucide-react";
+import { Plus, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -193,7 +193,9 @@ async function FeatureTasks({
                 className="p-4"
               />
             ) : (
-              todoTasks.map((task) => <TaskItem key={task.id} task={task} />)
+              todoTasks.map((task) => (
+                <TaskItem featureId={featureId} key={task.id} task={task} />
+              ))
             )}
           </div>
         </div>
@@ -215,7 +217,7 @@ async function FeatureTasks({
               />
             ) : (
               inProgressTasks.map((task) => (
-                <TaskItem key={task.id} task={task} />
+                <TaskItem featureId={featureId} key={task.id} task={task} />
               ))
             )}
           </div>
@@ -237,7 +239,9 @@ async function FeatureTasks({
                 className="p-4"
               />
             ) : (
-              doneTasks.map((task) => <TaskItem key={task.id} task={task} />)
+              doneTasks.map((task) => (
+                <TaskItem featureId={featureId} key={task.id} task={task} />
+              ))
             )}
           </div>
         </div>

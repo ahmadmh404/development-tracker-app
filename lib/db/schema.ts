@@ -8,28 +8,21 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import {
+  featureStatuses,
+  priorities,
+  projectStatuses,
+  taskStatuses,
+} from "../validations";
 
 // ═══════════════════════════════════════════════════════════════
 // ENUMS
 // ═══════════════════════════════════════════════════════════════
 
-export const priorityEnum = pgEnum("priority", ["High", "Medium", "Low"]);
-export const projectStatusEnum = pgEnum("project_status", [
-  "Planning",
-  "In Progress",
-  "Launched",
-  "Archived",
-]);
-export const featureStatusEnum = pgEnum("feature_status", [
-  "To Do",
-  "In Progress",
-  "Done",
-]);
-export const taskStatusEnum = pgEnum("task_status", [
-  "To Do",
-  "In Progress",
-  "Done",
-]);
+export const priorityEnum = pgEnum("priority", priorities);
+export const projectStatusEnum = pgEnum("project_status", projectStatuses);
+export const featureStatusEnum = pgEnum("feature_status", featureStatuses);
+export const taskStatusEnum = pgEnum("task_status", taskStatuses);
 
 // ═══════════════════════════════════════════════════════════════
 // TABLES
