@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { AppHeader } from "@/components/app-header";
 
 import "@/styles/globals.css";
+import { Toaster } from "sonner";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -56,6 +57,8 @@ export default function RootLayout({
           </SidebarInset>
         </SidebarProvider>
         {/* <Analytics /> */}
+
+        <Toaster />
       </body>
     </html>
   );

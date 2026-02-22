@@ -60,7 +60,7 @@ async function SuspendedPage(props: PageProps<"/projects/[id]">) {
       <div className="space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1 space-y-2">
-            <EditableTitle value={project.name} mode="project" />
+            <EditableTitle id={id} value={project.name} mode="project" />
             <p className="text-pretty text-muted-foreground">
               {project.description}
             </p>

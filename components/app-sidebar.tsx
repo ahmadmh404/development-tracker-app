@@ -12,15 +12,15 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuSkeleton,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { FolderKanban, Plus } from "lucide-react";
+import { FolderKanban, Home, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProjectDialog } from "@/components/projects/project-dialog";
 import { ProjectSidebarItem } from "@/components/projects/project-sidebar-item";
 import { SidebarProjectsEmpty } from "@/components/projects/sidebar-projects-empty";
 import { SidebarErrorBoundary } from "@/components/error-boundary";
 import { getProjects, getActiveProject } from "@/lib/queries/projects";
-import { connection } from "next/server";
 
 export function AppSidebar() {
   return (
@@ -29,9 +29,9 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
+            <SidebarMenuButton asChild>
               <Link href="/">
-                <FolderKanban className="!size-[23px] text-sidebar-primary" />
+                <FolderKanban className="size-5.75! text-sidebar-primary fill-sky-50!" />
                 <span className="text-lg font-semibold">Dev Tracker</span>
               </Link>
             </SidebarMenuButton>
@@ -39,8 +39,25 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
 
+      <SidebarSeparator />
+
       {/* Content - Projects List */}
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Pages</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href={"/"}>
+                  <Home className="size-5.75!" />
+                  Dashboard
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          <SidebarGroupContent></SidebarGroupContent>
+        </SidebarGroup>
+
         <SidebarGroup>
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarGroupContent>

@@ -61,7 +61,7 @@ export async function updateFeature(
   data: Partial<FeatureFormData>,
 ) {
   const existingFeature = await getFeatureById(id);
-  if (!existingFeature) throw new Error("Feature not found");
+  if (!existingFeature) return { error: "Feature not found" };
 
   const [feature] = await db
     .update(features)
@@ -82,7 +82,7 @@ export async function updateFeature(
 
 export async function deleteFeature(id: string) {
   const existingFeature = await getFeatureById(id);
-  if (!existingFeature) throw new Error("Feature not found");
+  if (!existingFeature) return { error: "Feature not found" };
 
   await db.delete(features).where(eq(features.id, id));
 
@@ -93,4 +93,24 @@ export async function deleteFeature(id: string) {
     .where(eq(projects.id, existingFeature.projectId));
 
   revalidatePath(`/projects/${existingFeature.projectId}`);
+}
+
+// update feature's name
+
+export async function editFeatureName(id: string, name: string) {
+  const existingFeature = await getFeatureById(id);
+  if (!existingFeature) return { error: "Feature not found" };
+
+  await db.update(features).set({ name }).where(eq(features.id, id));
+
+  // Update project's lastUpdated timestamp
+  await db
+    .update(projects)
+    .set({ lastUpdated: new Date() })
+    .where(eq(projects.id, existingFeature.projectId));
+
+  revalidatePath(`/projects/${existingFeature.projectId}`);
+  revalidatePath(`/projects/${existingFeature.projectId}/features/${id}`);
+
+  return { error: null };
 }

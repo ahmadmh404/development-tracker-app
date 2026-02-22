@@ -55,8 +55,6 @@ export function TaskDialog({
   const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
 
-  console.log("task: ", task);
-
   const form = useForm<TaskFormInput>({
     resolver: zodResolver(taskFormSchema),
     defaultValues: task

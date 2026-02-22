@@ -45,6 +45,9 @@ export async function updateProject(
   id: string,
   data: Partial<ProjectFormData>,
 ) {
+  const existingProject = await getProjectById(id);
+  if (existingProject != null) return { error: "Project not found" };
+
   const [project] = await db
     .update(projects)
     .set({
@@ -60,6 +63,9 @@ export async function updateProject(
 }
 
 export async function deleteProject(id: string) {
+  const existingProject = await getProjectById(id);
+  if (existingProject != null) return { error: "Project not found" };
+
   await db.delete(projects).where(eq(projects.id, id));
   revalidatePath("/projects");
 }
@@ -77,4 +83,24 @@ export async function calculateProgress(projectId: string): Promise<number> {
 
   const completedTasks = allTasks.filter((t) => t.status === "Done").length;
   return Math.round((completedTasks / allTasks.length) * 100);
+}
+
+// edit project title
+export async function editProjectName(id: string, name: string) {
+  const existingProject = await getProjectById(id);
+  if (existingProject == null) return { error: "Project not found" };
+
+  await db
+    .update(projects)
+    .set({
+      name,
+      lastUpdated: new Date(),
+    })
+    .where(eq(projects.id, id))
+    .returning();
+
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${id}`);
+
+  return { error: null };
 }

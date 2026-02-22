@@ -31,6 +31,7 @@ import {
 } from "@/components/loading";
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
+import { editFeatureName } from "@/app/actions/features";
 
 export default function FeatureDetailPage(
   props: PageProps<"/projects/[id]/features/[featureId]">,
@@ -75,7 +76,11 @@ async function SuspendedPage(
       <div className="space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1 space-y-2">
-            <EditableTitle value={feature.name} />
+            <EditableTitle
+              id={feature.id}
+              value={feature.name}
+              mode="feature"
+            />
             <p className="text-pretty text-muted-foreground">
               {feature.description}
             </p>

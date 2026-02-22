@@ -10,7 +10,6 @@ export const taskSchema = z.object({
   status: z.enum(taskStatuses),
   dueDate: z.date().nullable(), // ISO date string
   effortEstimate: z.string().nullable(),
-  featureId: z.string().uuid(),
 });
 
 // Form input schema (same as base for tasks)
@@ -20,7 +19,6 @@ export const taskFormSchema = z.object({
   status: z.enum(taskStatuses),
   dueDate: z.string().optional(), // Date input returns string
   effortEstimate: z.string().optional(),
-  featureId: z.string().uuid(),
 });
 
 // Types
