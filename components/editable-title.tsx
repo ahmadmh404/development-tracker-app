@@ -1,24 +1,23 @@
+"use client";
+
 import { Edit2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { useState } from "react";
 
 interface Props {
   value: string;
-  onChange: (value: string) => void;
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
+  mode?: "project" | "feature";
 }
 
-export function EditableTitle({ value, onChange, isOpen, setIsOpen }: Props) {
+export function EditableTitle({ value, mode = "project" }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <>
       {isOpen ? (
         <div className="flex items-center gap-2">
-          <Input
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="max-w-md"
-          />
+          <Input value={value} className="max-w-md" />
           <Button size="sm" onClick={() => setIsOpen(false)}>
             Save
           </Button>

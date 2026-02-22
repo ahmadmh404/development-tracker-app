@@ -1,3 +1,5 @@
+"use server";
+
 import { cacheTag } from "next/cache";
 import { db, projects } from "@/lib/db";
 import { desc, eq } from "drizzle-orm";
@@ -15,6 +17,9 @@ export async function getProjects(): Promise<
 }
 
 export async function getActiveProject(): Promise<{ id: string } | null> {
+  "use cache";
+  cacheTag("active-projects");
+
   return (
     (await db.query.projects.findFirst({
       where: eq(projects.status, "In Progress"),

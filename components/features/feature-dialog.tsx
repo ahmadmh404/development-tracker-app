@@ -122,7 +122,9 @@ export function FeatureDialog({
                     placeholder="e.g., User Authentication"
                     className={fieldState.invalid ? "border-destructive" : ""}
                   />
-                  <FieldError errors={[fieldState.error]} />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -139,7 +141,9 @@ export function FeatureDialog({
                     rows={3}
                     className={fieldState.invalid ? "border-destructive" : ""}
                   />
-                  <FieldError errors={[fieldState.error]} />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -167,7 +171,9 @@ export function FeatureDialog({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FieldError errors={[fieldState.error]} />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -194,7 +200,9 @@ export function FeatureDialog({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FieldError errors={[fieldState.error]} />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -211,7 +219,9 @@ export function FeatureDialog({
                     placeholder="e.g., 8 hours"
                     className={fieldState.invalid ? "border-destructive" : ""}
                   />
-                  <FieldError errors={[fieldState.error]} />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />

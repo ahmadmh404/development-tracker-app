@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Plus, FolderOpen, Lightbulb } from "lucide-react";
+import { Plus, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -60,12 +60,7 @@ async function SuspendedPage(props: PageProps<"/projects/[id]">) {
       <div className="space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1 space-y-2">
-            <EditableTitle
-              value={project.name}
-              onChange={(value) => console.log(value)}
-              isOpen={false}
-              setIsOpen={(isOpen) => console.log(isOpen)}
-            />
+            <EditableTitle value={project.name} mode="project" />
             <p className="text-pretty text-muted-foreground">
               {project.description}
             </p>

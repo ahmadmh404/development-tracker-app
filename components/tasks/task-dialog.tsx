@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,32 +23,73 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Task, TaskStatus } from "@/lib/mockData";
+import { Controller, useForm } from "react-hook-form";
+import {
+  TaskFormInput,
+  taskFormSchema,
+  taskStatuses,
+  transformTaskDataToForm,
+  transformTaskFormToData,
+} from "@/lib/validations";
+import { createTask, updateTask } from "@/app/actions/tasks";
+import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form } from "../ui/form";
+import { Loader2 } from "lucide-react";
+import { Field, FieldError, FieldLabel } from "../ui/field";
 
 interface TaskDialogProps {
   children: ReactNode;
   task?: Task;
+  mode?: "create" | "edit";
+  onSuccess?: () => void;
 }
 
-export function TaskDialog({ children, task }: TaskDialogProps) {
-  const isEdit = !!task;
+export function TaskDialog({
+  children,
+  task,
+  mode,
+  onSuccess,
+}: TaskDialogProps) {
+  const isEdit = mode === "edit" || !!task;
+  const [isPending, startTransition] = useTransition();
+  const [open, setOpen] = useState(false);
 
-  const [title, setTitle] = useState(task?.title || "");
-  const [description, setDescription] = useState(task?.description || "");
-  const [status, setStatus] = useState<TaskStatus>(task?.status || "To Do");
-  const [dueDate, setDueDate] = useState(task?.dueDate || "");
-  const [effortEstimate, setEffortEstimate] = useState(
-    task?.effortEstimate || "",
-  );
+  const form = useForm<TaskFormInput>({
+    resolver: zodResolver(taskFormSchema),
+    defaultValues: task
+      ? transformTaskDataToForm(task)
+      : {
+          title: "",
+          description: "",
+          dueDate: "",
+          status: "To Do",
+          effortEstimate: "",
+        },
+  });
 
-  const handleSave = () => {
-    const data: Partial<Task> = {
-      title,
-      description,
-      status,
-      dueDate,
-      effortEstimate,
-    };
-  };
+  function onSubmit(data: TaskFormInput) {
+    startTransition(async () => {
+      try {
+        const formData = transformTaskFormToData(data);
+        if (isEdit && task) {
+          await updateTask(task.id, formData);
+          toast.success("Project updated");
+        } else {
+          await createTask(formData);
+          toast.success("Project created");
+        }
+        setOpen(false);
+        form.reset();
+        onSuccess?.();
+      } catch (error) {
+        console.error(error);
+        toast.error(
+          isEdit ? "Failed to update project" : "Failed to create project",
+        );
+      }
+    });
+  }
 
   return (
     <Dialog>
@@ -60,68 +101,148 @@ export function TaskDialog({ children, task }: TaskDialogProps) {
             {isEdit ? "Update task details" : "Add a new task to the feature"}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="task-title">Task Title</Label>
-            <Input
-              id="task-title"
-              placeholder="e.g., Create login form"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <Controller
+              name="title"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Task Title</FieldLabel>
+                  <Input
+                    {...field}
+                    disabled={fieldState.invalid}
+                    placeholder="e.g., Create login form"
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="task-description">Description</Label>
-            <Textarea
-              id="task-description"
-              placeholder="Describe the task..."
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+
+            <Controller
+              name="title"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Task Title</FieldLabel>
+                  <Input
+                    {...field}
+                    disabled={fieldState.invalid}
+                    placeholder="e.g., Create login form"
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="task-status">Status</Label>
-            <Select
-              value={status}
-              onValueChange={(v) => setStatus(v as TaskStatus)}
-            >
-              <SelectTrigger id="task-status">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="To Do">To Do</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Done">Done</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="due-date">Due Date</Label>
-              <Input
-                id="due-date"
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="task-effort">Effort Estimate</Label>
-              <Input
-                id="task-effort"
-                placeholder="e.g., 2 hours"
-                value={effortEstimate}
-                onChange={(e) => setEffortEstimate(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
+
+            <Controller
+              name="description"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Task Description</FieldLabel>
+                  <Textarea
+                    {...field}
+                    disabled={fieldState.invalid}
+                    placeholder="Describe the task..."
+                    rows={3}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="status"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Status</FieldLabel>
+
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger
+                      className={fieldState.invalid ? "border-destructive" : ""}
+                    >
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {taskStatuses.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="dueDate"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Due Date</FieldLabel>
+                  <Input {...field} type="date" disabled={fieldState.invalid} />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="effortEstimate"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Error Estimate</FieldLabel>
+                  <Input
+                    {...field}
+                    placeholder="e.g., 2 hours"
+                    disabled={fieldState.invalid}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="submit" disabled={isPending}>
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isEdit ? "Save Changes" : "Create Project"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+
         <DialogFooter>
           <DialogClose>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button onClick={handleSave} disabled={!title}>
+          <Button disabled={isPending}>
             {isEdit ? "Save Changes" : "Create Task"}
           </Button>
         </DialogFooter>

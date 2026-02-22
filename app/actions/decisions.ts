@@ -5,9 +5,6 @@ import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { decisionSchema, type DecisionFormData } from "@/lib/validations";
 
-// Re-export schema for use in forms
-export { decisionSchema, type DecisionFormData };
-
 // ═══════════════════════════════════════════════════════════════
 // READ OPERATIONS
 // ═══════════════════════════════════════════════════════════════

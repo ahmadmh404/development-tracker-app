@@ -70,8 +70,8 @@ export function ProjectDialog({
     startTransition(async () => {
       try {
         const formData = transformProjectFormToData(data);
-        if (isEdit) {
-          await updateProject(project!.id, formData);
+        if (isEdit && project) {
+          await updateProject(project.id, formData);
           toast.success("Project updated");
         } else {
           await createProject(formData);
@@ -81,10 +81,10 @@ export function ProjectDialog({
         form.reset();
         onSuccess?.();
       } catch (error) {
+        console.error(error);
         toast.error(
           isEdit ? "Failed to update project" : "Failed to create project",
         );
-        console.error(error);
       }
     });
   }
@@ -160,7 +160,9 @@ export function ProjectDialog({
                       ))}
                     </SelectContent>
                   </Select>
-                  <FieldError errors={[fieldState.error]} />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />

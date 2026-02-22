@@ -1,3 +1,5 @@
+"use client";
+
 import { Suspense } from "react";
 import Link from "next/link";
 import {
@@ -20,6 +22,7 @@ import { ProjectSidebarItem } from "@/components/projects/project-sidebar-item";
 import { SidebarProjectsEmpty } from "@/components/projects/sidebar-projects-empty";
 import { SidebarErrorBoundary } from "@/components/error-boundary";
 import { getProjects, getActiveProject } from "@/lib/queries/projects";
+import { connection } from "next/server";
 
 export function AppSidebar() {
   return (

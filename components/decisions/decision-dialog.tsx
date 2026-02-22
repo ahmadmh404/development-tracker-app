@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -15,39 +15,75 @@ import {
 } from "@/components/ui/dialog";
 import type { Decision } from "@/lib/mockData";
 import { DialogClose } from "@radix-ui/react-dialog";
+import {
+  DecisionFormInput,
+  decisionFormSchema,
+  transformDecisionDataToForm,
+  transformDecisionFormToData,
+} from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { Form } from "../ui/form";
+import { createDecision, updateDecision } from "@/app/actions/decisions";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field";
 
 interface DecisionDialogProps {
   children: ReactNode;
   decision?: Decision;
+  mode?: "create" | "edit";
+  onSuccess?: () => void;
 }
 
-export function DecisionDialog({ children, decision }: DecisionDialogProps) {
-  const isEdit = !!decision;
+export function DecisionDialog({
+  children,
+  decision,
+  mode,
+  onSuccess,
+}: DecisionDialogProps) {
+  const isEdit = mode === "edit" || !!decision;
+  const [isPending, startTransition] = useTransition();
+  const [open, setOpen] = useState(false);
 
-  const [decisionText, setDecisionText] = useState(decision?.text || "");
-  const [prosText, setProsText] = useState(decision?.pros?.join("\n") || "");
-  const [consText, setConsText] = useState(decision?.cons?.join("\n") || "");
-  const [alternatives, setAlternatives] = useState(
-    decision?.alternatives || "",
-  );
+  const form = useForm<DecisionFormInput>({
+    resolver: zodResolver(decisionFormSchema),
+    defaultValues: decision
+      ? transformDecisionDataToForm(decision)
+      : {
+          text: "",
+          date: "",
+          pros: "",
+          cons: "",
+          alternatives: "",
+        },
+  });
 
-  const handleSave = () => {
-    const data: Partial<Decision> = {
-      text: decisionText,
-      pros: prosText
-        .split("\n")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      cons: consText
-        .split("\n")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      alternatives,
-    };
-  };
+  function onSubmit(data: DecisionFormInput) {
+    startTransition(async () => {
+      try {
+        const formData = transformDecisionFormToData(data);
+        if (isEdit && decision) {
+          await updateDecision(decision.id, formData);
+          toast.success("Decision updated");
+        } else {
+          await createDecision(formData);
+          toast.success("Decision created");
+        }
+        setOpen(false);
+        form.reset();
+        onSuccess?.();
+      } catch (error) {
+        console.error(error);
+        toast.error(
+          isEdit ? "Failed to update Decision" : "Failed to create Decision",
+        );
+      }
+    });
+  }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
       <DialogContent className="max-w-2xl">
@@ -61,62 +97,95 @@ export function DecisionDialog({ children, decision }: DecisionDialogProps) {
               : "Record an important technical or design decision"}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="decision-text">Decision</Label>
-            <Textarea
-              id="decision-text"
-              placeholder="What did you decide?"
-              rows={3}
-              value={decisionText}
-              onChange={(e) => setDecisionText(e.target.value)}
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <Controller
+              name="text"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Decision</FieldLabel>
+                  <Textarea
+                    {...field}
+                    placeholder="What did you decide?"
+                    className={fieldState.invalid ? "border-destructive" : ""}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="pros">Pros</Label>
-            <Textarea
-              id="pros"
-              placeholder="List benefits (one per line)..."
-              rows={3}
-              value={prosText}
-              onChange={(e) => setProsText(e.target.value)}
+
+            <Controller
+              name="pros"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Pros</FieldLabel>
+                  <Textarea
+                    {...field}
+                    placeholder="List benefits (one per line)..."
+                    className={fieldState.invalid ? "border-destructive" : ""}
+                  />
+
+                  <FieldDescription>One benefit per line</FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
             />
-            <p className="text-xs text-muted-foreground">
-              One benefit per line
-            </p>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="cons">Cons</Label>
-            <Textarea
-              id="cons"
-              placeholder="List trade-offs (one per line)..."
-              rows={3}
-              value={consText}
-              onChange={(e) => setConsText(e.target.value)}
+
+            <Controller
+              name="cons"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Pros</FieldLabel>
+                  <Textarea
+                    {...field}
+                    placeholder="List benefits (one per line)..."
+                    className={fieldState.invalid ? "border-destructive" : ""}
+                  />
+                </Field>
+              )}
             />
-            <p className="text-xs text-muted-foreground">
-              One trade-off per line
-            </p>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="alternatives">Alternatives Considered</Label>
-            <Textarea
-              id="alternatives"
-              placeholder="What other options did you consider?"
-              rows={2}
-              value={alternatives}
-              onChange={(e) => setAlternatives(e.target.value)}
+
+            <Controller
+              name="cons"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Pros</FieldLabel>
+                  <Textarea
+                    {...field}
+                    placeholder="What other options did you consider?"
+                    className={fieldState.invalid ? "border-destructive" : ""}
+                  />
+
+                  <FieldDescription>One trade-off per line</FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
             />
-          </div>
-        </div>
-        <DialogFooter>
-          <DialogClose>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button onClick={handleSave} disabled={!decisionText}>
-            {isEdit ? "Save Changes" : "Log Decision"}
-          </Button>
-        </DialogFooter>
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="submit" disabled={isPending}>
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isEdit ? "Save Changes" : "Create Project"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

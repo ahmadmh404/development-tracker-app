@@ -5,9 +5,6 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { projectSchema, type ProjectFormData } from "@/lib/validations";
 
-// Re-export schema for use in forms
-export { projectSchema, type ProjectFormData };
-
 // ═══════════════════════════════════════════════════════════════
 // READ OPERATIONS
 // ═══════════════════════════════════════════════════════════════

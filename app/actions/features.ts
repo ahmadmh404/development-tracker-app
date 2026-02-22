@@ -5,9 +5,6 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { featureSchema, type FeatureFormData } from "@/lib/validations";
 
-// Re-export schema for use in forms
-export { featureSchema, type FeatureFormData };
-
 // ═══════════════════════════════════════════════════════════════
 // READ OPERATIONS
 // ═══════════════════════════════════════════════════════════════
