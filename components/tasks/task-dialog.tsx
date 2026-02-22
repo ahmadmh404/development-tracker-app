@@ -4,7 +4,6 @@ import { ReactNode, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -22,7 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { Task, TaskStatus } from "@/lib/mockData";
+import type { Task } from "@/lib/mockData";
 import { Controller, useForm } from "react-hook-form";
 import {
   TaskFormInput,
@@ -96,7 +95,7 @@ export function TaskDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="overflow-y-hidden">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Task" : "Create New Task"}</DialogTitle>
           <DialogDescription>
@@ -105,26 +104,10 @@ export function TaskDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <Controller
-              name="title"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field>
-                  <FieldLabel>Task Title</FieldLabel>
-                  <Input
-                    {...field}
-                    disabled={fieldState.invalid}
-                    placeholder="e.g., Create login form"
-                  />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="overflow-y-auto space-y-4"
+          >
             <Controller
               name="title"
               control={form.control}
@@ -228,26 +211,14 @@ export function TaskDialog({
 
             <DialogFooter>
               <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
+                <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button type="submit" disabled={isPending}>
-                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEdit ? "Save Changes" : "Create Project"}
+              <Button disabled={isPending}>
+                {isEdit ? "Save Changes" : "Create Task"}
               </Button>
             </DialogFooter>
           </form>
         </Form>
-
-        <DialogFooter>
-          <DialogClose>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button disabled={isPending}>
-            {isEdit ? "Save Changes" : "Create Task"}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

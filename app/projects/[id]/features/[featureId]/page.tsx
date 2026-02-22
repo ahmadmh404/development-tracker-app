@@ -129,7 +129,7 @@ async function SuspendedPage(
       <div className="hidden lg:block">
         <ResizablePanelGroup direction="horizontal" className="min-h-[600px]">
           {/* Tasks Panel */}
-          <ResizablePanel defaultSize={55} minSize={30}>
+          <ResizablePanel defaultSize={70} minSize={30}>
             <FeatureTasks
               featureId={featureId}
               className="h-full space-y-4 pr-4"
@@ -139,7 +139,7 @@ async function SuspendedPage(
           <ResizableHandle withHandle />
 
           {/* Decisions Panel */}
-          <ResizablePanel defaultSize={45} minSize={30}>
+          <ResizablePanel defaultSize={30} minSize={30}>
             <FeatureDecisions
               featureId={feature.id}
               className="h-full space-y-4 pl-4"

@@ -144,7 +144,7 @@ export function DecisionDialog({
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field>
-                  <FieldLabel>Pros</FieldLabel>
+                  <FieldLabel>Cons</FieldLabel>
                   <Textarea
                     {...field}
                     placeholder="List benefits (one per line)..."
@@ -155,11 +155,11 @@ export function DecisionDialog({
             />
 
             <Controller
-              name="cons"
+              name="alternatives"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field>
-                  <FieldLabel>Pros</FieldLabel>
+                  <FieldLabel>Alternatives</FieldLabel>
                   <Textarea
                     {...field}
                     placeholder="What other options did you consider?"

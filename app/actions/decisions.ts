@@ -52,6 +52,7 @@ export async function createDecision(
   const feature = await db.query.features.findFirst({
     where: eq(features.id, featureId),
   });
+
   if (!feature) throw new Error("Feature not found");
 
   const [decision] = await db
