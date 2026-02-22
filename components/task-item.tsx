@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { tasks } from "@/lib/db";
 import { TaskDialog } from "./tasks/task-dialog";
 import { DeleteDialog } from "./delete-dialog";
+import { deleteTask } from "@/app/actions/tasks";
 
 interface TaskItemProps {
   featureId: string;
@@ -49,9 +50,9 @@ export function TaskItem({ featureId, task }: TaskItemProps) {
             </TaskDialog>
 
             <DeleteDialog
-              onConfirm={() => {}}
               title="Delete Task"
               description="Are you sure you wanna delete this task?"
+              onConfirm={deleteTask.bind(null, task.id)}
             >
               <Button
                 variant="ghost"

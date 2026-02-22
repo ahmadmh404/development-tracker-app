@@ -16,6 +16,7 @@ import { calculateProgress } from "@/app/actions/projects";
 import { EmptyState } from "@/components/empty-state";
 import { FeatureDialog } from "./features/feature-dialog";
 import { DeleteDialog } from "./delete-dialog";
+import { deleteFeature } from "@/app/actions/features";
 
 interface FeatureListProps {
   features: Omit<
@@ -128,9 +129,9 @@ export function FeatureList({ features, projectId }: FeatureListProps) {
                       </Button>
                     </FeatureDialog>
                     <DeleteDialog
-                      onConfirm={() => {}}
                       title="Delete Feature"
                       description="Are you sure you wanna delete this feature?"
+                      onConfirm={deleteFeature.bind(null, feature.id)}
                     >
                       <Button
                         variant="ghost"
