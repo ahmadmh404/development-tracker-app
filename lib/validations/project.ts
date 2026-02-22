@@ -12,16 +12,16 @@ export const projectStatuses = [
 export const projectSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
   description: z.string().default(""),
-  status: z.enum(projectStatuses).nullable(),
-  techStack: z.array(z.string()).nullable(),
+  status: z.enum(projectStatuses),
+  techStack: z.array(z.string()).default([]),
 });
 
 // Form input schema (techStack as comma-separated string for user input)
 export const projectFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
   description: z.string().default(""),
-  status: z.enum(projectStatuses).optional(),
-  techStack: z.string().optional(), // Comma-separated in form
+  status: z.enum(projectStatuses),
+  techStack: z.string(), // Comma-separated in form
 });
 
 // Types

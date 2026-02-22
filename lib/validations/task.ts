@@ -7,7 +7,7 @@ export const taskStatuses = ["To Do", "In Progress", "Done"] as const;
 export const taskSchema = z.object({
   title: z.string().min(1, "Title is required").max(255),
   description: z.string().default(""),
-  status: z.enum(taskStatuses).nullable(),
+  status: z.enum(taskStatuses),
   dueDate: z.date().nullable(), // ISO date string
   effortEstimate: z.string().nullable(),
   featureId: z.string().uuid(),
@@ -17,7 +17,7 @@ export const taskSchema = z.object({
 export const taskFormSchema = z.object({
   title: z.string().min(1, "Title is required").max(255),
   description: z.string().default(""),
-  status: z.enum(taskStatuses).optional(),
+  status: z.enum(taskStatuses),
   dueDate: z.string().optional(), // Date input returns string
   effortEstimate: z.string().optional(),
   featureId: z.string().uuid(),

@@ -15,6 +15,7 @@ import { Feature, tasks } from "@/lib/db";
 import { calculateProgress } from "@/app/actions/projects";
 import { EmptyState } from "@/components/empty-state";
 import { FeatureDialog } from "./features/feature-dialog";
+import { DeleteDialog } from "./delete-dialog";
 
 interface FeatureListProps {
   features: Omit<
@@ -126,14 +127,20 @@ export function FeatureList({ features, projectId }: FeatureListProps) {
                         <span className="sr-only">Edit feature</span>
                       </Button>
                     </FeatureDialog>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive"
+                    <DeleteDialog
+                      onConfirm={() => {}}
+                      title="Delete Feature"
+                      description="Are you sure you wanna delete this feature?"
                     >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Delete feature</span>
-                    </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete feature</span>
+                      </Button>
+                    </DeleteDialog>
                   </div>
                 </TableCell>
               </TableRow>

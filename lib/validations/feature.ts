@@ -8,8 +8,8 @@ export const priorities = ["High", "Medium", "Low"] as const;
 export const featureSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
   description: z.string().default(""),
-  priority: z.enum(priorities).nullable(),
-  status: z.enum(featureStatuses).nullable(),
+  priority: z.enum(priorities),
+  status: z.enum(featureStatuses),
   effortEstimate: z.string().nullable().nullable(),
 });
 
@@ -17,8 +17,8 @@ export const featureSchema = z.object({
 export const featureFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
   description: z.string().default(""),
-  priority: z.enum(priorities).optional(),
-  status: z.enum(featureStatuses).optional(),
+  priority: z.enum(priorities),
+  status: z.enum(featureStatuses),
   effortEstimate: z.string().optional(),
 });
 
@@ -32,8 +32,6 @@ export function transformFeatureFormToData(
 ): FeatureFormData {
   return {
     ...data,
-    priority: data.priority ?? null,
-    status: data.status ?? null,
     effortEstimate: data.effortEstimate || null,
   };
 }

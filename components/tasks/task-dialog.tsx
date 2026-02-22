@@ -39,7 +39,7 @@ import { Field, FieldError, FieldLabel } from "../ui/field";
 interface TaskDialogProps {
   featureId: string;
   children: ReactNode;
-  task?: Task;
+  task?: Omit<Task, "createdAt">;
   mode?: "create" | "edit";
   onSuccess?: () => void;
 }

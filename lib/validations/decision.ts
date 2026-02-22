@@ -4,17 +4,17 @@ import { z } from "zod";
 export const decisionSchema = z.object({
   text: z.string().min(1, "Decision text is required"),
   date: z.date().nullable(),
-  pros: z.array(z.string()).nullable(),
-  cons: z.array(z.string()).nullable(),
+  pros: z.array(z.string()),
+  cons: z.array(z.string()),
   alternatives: z.string().nullable(),
 });
 
 // Form input schema (pros/cons as newline-separated strings)
 export const decisionFormSchema = z.object({
   text: z.string().min(1, "Decision text is required"),
-  date: z.string().optional(),
-  pros: z.string().optional(), // Newline-separated in form
-  cons: z.string().optional(), // Newline-separated in form
+  date: z.string(),
+  pros: z.string(), // Newline-separated in form
+  cons: z.string(), // Newline-separated in form
   alternatives: z.string().optional(),
 });
 

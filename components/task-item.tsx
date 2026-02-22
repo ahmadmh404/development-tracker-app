@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { tasks } from "@/lib/db";
 import { TaskDialog } from "./tasks/task-dialog";
+import { DeleteDialog } from "./delete-dialog";
 
 interface TaskItemProps {
   featureId: string;
@@ -46,14 +47,21 @@ export function TaskItem({ featureId, task }: TaskItemProps) {
                 <span className="sr-only">Edit task</span>
               </Button>
             </TaskDialog>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-destructive"
+
+            <DeleteDialog
+              onConfirm={() => {}}
+              title="Delete Task"
+              description="Are you sure you wanna delete this task?"
             >
-              <Trash2 className="h-4 w-4" />
-              <span className="sr-only">Delete task</span>
-            </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span className="sr-only">Delete task</span>
+              </Button>
+            </DeleteDialog>
           </div>
         </div>
 
