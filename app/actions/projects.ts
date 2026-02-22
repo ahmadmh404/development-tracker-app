@@ -46,7 +46,7 @@ export async function updateProject(
   data: Partial<ProjectFormData>,
 ) {
   const existingProject = await getProjectById(id);
-  if (existingProject != null) return { error: "Project not found" };
+  if (existingProject == null) return { error: "Project not found" };
 
   const [project] = await db
     .update(projects)
@@ -59,7 +59,7 @@ export async function updateProject(
 
   revalidatePath("/projects");
   revalidatePath(`/projects/${id}`);
-  return project;
+  return { project };
 }
 
 export async function deleteProject(id: string) {

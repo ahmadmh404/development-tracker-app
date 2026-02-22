@@ -102,6 +102,9 @@ export async function deleteTask(id: string) {
     .where(eq(projects.id, existingTask.feature.projectId));
 
   revalidatePath(`/projects/${existingTask.feature.projectId}`);
+  revalidatePath(
+    `/projects/${existingTask.feature.projectId}/features/$${existingTask.featureId}`,
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════

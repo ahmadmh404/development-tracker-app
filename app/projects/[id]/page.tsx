@@ -3,19 +3,13 @@ import { Plus, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { AppBreadcrumb } from "@/components/app-breadcrumb";
 import { FeatureList } from "@/components/feature-list";
 import { DecisionCard } from "@/components/decision-card";
 import { FeatureDialog } from "@/components/features/feature-dialog";
 import { EditableTitle } from "@/components/editable-title";
-import { db, decisions, features, projects } from "@/lib/db";
+import { db, features, projects } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { cacheTag } from "next/cache";
 import {
@@ -25,6 +19,7 @@ import {
 } from "@/components/loading";
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
+import { ProjectStatus } from "@/components/projects/project-status";
 
 export default function ProjectDetailPage(props: PageProps<"/projects/[id]">) {
   return (
@@ -67,17 +62,7 @@ async function SuspendedPage(props: PageProps<"/projects/[id]">) {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Select defaultValue={project.status}>
-              <SelectTrigger className="w-[160px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Planning">Planning</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Launched">Launched</SelectItem>
-                <SelectItem value="Archived">Archived</SelectItem>
-              </SelectContent>
-            </Select>
+            <ProjectStatus id={project.id} status={project.status} />
           </div>
         </div>
 
