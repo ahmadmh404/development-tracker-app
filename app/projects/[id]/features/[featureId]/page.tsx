@@ -10,7 +10,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AppBreadcrumb } from "@/components/app-breadcrumb";
-import { TaskItem } from "@/components/task-item";
 import { DecisionCard } from "@/components/decision-card";
 import {
   ResizablePanelGroup,
@@ -24,14 +23,10 @@ import { db, decisions, features, projects, tasks } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { EditableTitle } from "@/components/editable-title";
 import { cn } from "@/lib/utils";
-import {
-  FeaturePageLoading,
-  TasksLoading,
-  DecisionsLoading,
-} from "@/components/loading";
+import { FeaturePageLoading } from "@/components/loading";
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
-import { editFeatureName } from "@/app/actions/features";
+import { TaskColumn } from "@/components/tasks/tasks-column";
 
 export default function FeatureDetailPage(
   props: PageProps<"/projects/[id]/features/[featureId]">,
@@ -120,8 +115,7 @@ async function SuspendedPage(
         </div>
       </div>
 
-      {/* Main Content - Tasks and Decisions */}
-      {/* Mobile: Flex column layout */}
+      {/* Main Content + Mobile flex column - Tasks and Decisions */}
       <div className="flex flex-col gap-6 lg:hidden">
         {/* Tasks Section */}
         <FeatureTasks featureId={feature.id} className="space-y-4" />
@@ -181,75 +175,33 @@ async function FeatureTasks({
       </div>
 
       {/* Column-based task layout */}
-      <div className="grid gap-4 xl:grid-cols-3">
-        {/* To Do Column */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2">
-            <h3 className="text-sm font-medium">To Do</h3>
-            <span className="text-xs text-muted-foreground">
-              {todoTasks.length}
-            </span>
-          </div>
-          <div className="space-y-2">
-            {todoTasks.length === 0 ? (
-              <EmptyState
-                title="No tasks"
-                description="Add your first task"
-                className="p-4"
-              />
-            ) : (
-              todoTasks.map((task) => (
-                <TaskItem featureId={featureId} key={task.id} task={task} />
-              ))
-            )}
-          </div>
-        </div>
+      <div className="grid gap-3 grid-cols-1 xs:grid-cols-2 sm:grid-cols-3">
+        <TaskColumn
+          id="To Do"
+          featureId={featureId}
+          title="To Do"
+          tasks={todoTasks}
+          count={todoTasks.length}
+          colorClass="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/10"
+        />
 
-        {/* In Progress Column */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2">
-            <h3 className="text-sm font-medium">In Progress</h3>
-            <span className="text-xs text-muted-foreground">
-              {inProgressTasks.length}
-            </span>
-          </div>
-          <div className="space-y-2">
-            {inProgressTasks.length === 0 ? (
-              <EmptyState
-                title="No tasks"
-                description="Tasks in progress will appear here"
-                className="p-4"
-              />
-            ) : (
-              inProgressTasks.map((task) => (
-                <TaskItem featureId={featureId} key={task.id} task={task} />
-              ))
-            )}
-          </div>
-        </div>
+        <TaskColumn
+          id="In Progress"
+          featureId={featureId}
+          title="In Progress"
+          tasks={inProgressTasks}
+          count={inProgressTasks.length}
+          colorClass="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/10"
+        />
 
-        {/* Done Column */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2">
-            <h3 className="text-sm font-medium">Done</h3>
-            <span className="text-xs text-muted-foreground">
-              {doneTasks.length}
-            </span>
-          </div>
-          <div className="space-y-2">
-            {doneTasks.length === 0 ? (
-              <EmptyState
-                title="No tasks"
-                description="Completed tasks will appear here"
-                className="p-4"
-              />
-            ) : (
-              doneTasks.map((task) => (
-                <TaskItem featureId={featureId} key={task.id} task={task} />
-              ))
-            )}
-          </div>
-        </div>
+        <TaskColumn
+          id="Done"
+          featureId={featureId}
+          title="Done"
+          tasks={doneTasks}
+          count={doneTasks.length}
+          colorClass="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/10"
+        />
       </div>
     </div>
   );
