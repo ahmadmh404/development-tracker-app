@@ -1,10 +1,9 @@
 "use client";
 
-import { Search } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
 import { AppBreadcrumb } from "./app-breadcrumb";
+import { SearchInput } from "./search/search-input";
 
 export function AppHeader() {
   return (
@@ -13,14 +12,7 @@ export function AppHeader() {
       <Separator orientation="vertical" className="mr-2 h-4" />
       <AppBreadcrumb items={[]} />
       <div className="flex flex-1 items-center justify-end gap-4">
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search projects, features, tasks..."
-            className="pl-9"
-          />
-        </div>
+        <SearchInput />
       </div>
     </header>
   );
