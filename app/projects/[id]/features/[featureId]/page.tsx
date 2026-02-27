@@ -26,14 +26,16 @@ import { features, projects, tasks, decisions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { EditableTitle } from "@/components/editable-title";
 import { cn } from "@/lib/utils";
-import {
-  FeaturePageLoading,
-  TasksLoading,
-  DecisionsLoading,
-} from "@/components/loading";
+import { FeaturePageLoading } from "@/components/loading";
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
-import { editFeatureName } from "@/app/actions/features";
+import { getFeatures } from "@/lib/queries/features";
+
+export async function generateStaticParams() {
+  const features = await getFeatures();
+
+  return features.map((feat) => ({ featureId: feat.id }));
+}
 
 export default function FeatureDetailPage(
   props: PageProps<"/projects/[id]/features/[featureId]">,

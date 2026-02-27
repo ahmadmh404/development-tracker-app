@@ -26,6 +26,13 @@ import {
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
 import { features, projects } from "@/lib/db/schema";
+import { getProjects } from "@/lib/queries/projects";
+
+export async function generateStaticParams() {
+  const projects = await getProjects();
+
+  return projects.map((proj) => ({ id: proj.id }));
+}
 
 export default function ProjectDetailPage(props: PageProps<"/projects/[id]">) {
   return (
