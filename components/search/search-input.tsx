@@ -5,6 +5,7 @@ import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SearchDropdown } from "./search-dropdown";
 import { cn } from "@/lib/utils";
+import { MIN_SEARCH_LENGTH, SEARCH_DEBOUNCE_MS } from "@/lib/constants";
 
 interface SearchInputProps {
   className?: string;
@@ -16,11 +17,11 @@ export function SearchInput({ className }: SearchInputProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Debounce the search query (300ms)
+  // Debounce the search query
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
-    }, 300);
+    }, SEARCH_DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
   }, [query]);
@@ -53,7 +54,7 @@ export function SearchInput({ className }: SearchInputProps) {
   }, []);
 
   const handleFocus = () => {
-    if (query.length >= 2) {
+    if (query.length >= MIN_SEARCH_LENGTH) {
       setIsOpen(true);
     }
   };
@@ -61,7 +62,7 @@ export function SearchInput({ className }: SearchInputProps) {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-    if (value.length >= 2) {
+    if (value.length >= MIN_SEARCH_LENGTH) {
       setIsOpen(true);
     } else {
       setIsOpen(false);
@@ -106,7 +107,7 @@ export function SearchInput({ className }: SearchInputProps) {
         )}
       </div>
 
-      {isOpen && debouncedQuery.length >= 2 && (
+      {isOpen && debouncedQuery.length >= MIN_SEARCH_LENGTH && (
         <SearchDropdown query={debouncedQuery} onSelect={handleSelect} />
       )}
     </div>

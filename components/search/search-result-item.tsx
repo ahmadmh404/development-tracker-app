@@ -10,6 +10,7 @@ interface SearchResultItemProps {
   title: string;
   subtitle?: string;
   href: string;
+  isSelected?: boolean;
   badge?: {
     text: string;
     variant?: "default" | "secondary" | "destructive" | "outline";
@@ -23,6 +24,7 @@ export function SearchResultItem({
   title,
   subtitle,
   href,
+  isSelected,
   badge,
   onClick,
 }: SearchResultItemProps) {
@@ -32,10 +34,12 @@ export function SearchResultItem({
       onClick={onClick}
       className={cn(
         "flex items-center gap-3 py-2 px-3 cursor-default select-none",
-        "data-[selected=true]:bg-accent hover:bg-accent transition-colors",
+        isSelected
+          ? "bg-accent"
+          : "hover:bg-accent data-[selected=true]:bg-accent",
         "rounded-sm",
       )}
-      data-selected={false}
+      data-selected={isSelected}
     >
       <Icon className="size-4 shrink-0 text-muted-foreground" />
       <div className="flex flex-1 flex-col min-w-0">
