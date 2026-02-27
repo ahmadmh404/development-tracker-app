@@ -54,11 +54,16 @@ export async function updateDecision(
   const existingDecision = await getDecisionById(id);
   if (!existingDecision) return { error: "Decision not found" };
 
+  const validated = decisionSchema.partial().parse(data);
+
   const [decision] = await db
     .update(decisions)
     .set({
-      ...data,
+      ...validated,
       date: data.date ? new Date(data.date) : undefined,
+      pros: validated.pros ?? [],
+      cons: validated.cons ?? [],
+      alternatives: validated.alternatives ?? null,
     })
     .where(eq(decisions.id, id))
     .returning();

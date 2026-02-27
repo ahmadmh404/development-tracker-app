@@ -31,7 +31,7 @@ import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field";
 interface DecisionDialogProps {
   featureId: string;
   children: ReactNode;
-  decision?: Decision;
+  decision?: Omit<Decision, "createdAt">;
   mode?: "create" | "edit";
   onSuccess?: () => void;
 }
