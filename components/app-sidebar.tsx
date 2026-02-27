@@ -24,14 +24,14 @@ import { getProjects, getActiveProject } from "@/lib/queries/projects";
 
 export function AppSidebar() {
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="offcanvas">
       {/* Header - Logo */}
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href="/">
-                <FolderKanban className="size-5.75! text-sidebar-primary fill-sky-50!" />
+                <FolderKanban className="size-5 text-sidebar-primary fill-sky-50!" />
                 <span className="text-lg font-semibold">Dev Tracker</span>
               </Link>
             </SidebarMenuButton>
@@ -49,7 +49,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Link href={"/"}>
-                  <Home className="size-5.75!" />
+                  <Home className="size-5" />
                   Dashboard
                 </Link>
               </SidebarMenuButton>
