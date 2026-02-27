@@ -5,6 +5,7 @@ import { features, projects } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { featureSchema, type FeatureFormData } from "@/lib/validations";
+import { getProjectById } from "./projects";
 
 // ═══════════════════════════════════════════════════════════════
 // READ OPERATIONS
@@ -33,6 +34,9 @@ export async function getFeaturesByProjectId(projectId: string) {
 // ═══════════════════════════════════════════════════════════════
 
 export async function createFeature(projectId: string, data: FeatureFormData) {
+  const existingProject = await getProjectById(projectId);
+  if (existingProject == null) return { error: "Project not found" };
+
   const validated = featureSchema.parse(data);
 
   const [feature] = await db
@@ -54,7 +58,8 @@ export async function createFeature(projectId: string, data: FeatureFormData) {
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/projects/${projectId}/features`);
-  return feature;
+
+  return { error: null };
 }
 
 export async function updateFeature(

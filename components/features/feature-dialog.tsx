@@ -72,25 +72,19 @@ export function FeatureDialog({
 
   function onSubmit(data: FeatureFormInput) {
     startTransition(async () => {
-      try {
-        const formData = transformFeatureFormToData(data);
-        console.log("formData: ", formData);
-        if (isEdit) {
-          await updateFeature(feature!.id, formData);
-          toast.success("Feature updated");
-        } else {
-          await createFeature(projectId, formData);
-          toast.success("Feature created");
-        }
-        setOpen(false);
-        form.reset();
-        onSuccess?.();
-      } catch (error) {
-        toast.error(
-          isEdit ? "Failed to update feature" : "Failed to create feature",
-        );
-        console.error(error);
+      const formData = transformFeatureFormToData(data);
+      if (isEdit) {
+        const { error } = await updateFeature(feature!.id, formData);
+        if (error) toast.error(error);
+        else toast.success("Feature updated");
+      } else {
+        const { error } = await createFeature(projectId, formData);
+        if (error) toast.error(error);
+        else toast.success("Feature created");
       }
+      setOpen(false);
+      form.reset();
+      onSuccess?.();
     });
   }
 

@@ -70,24 +70,19 @@ export function TaskDialog({
 
   function onSubmit(data: TaskFormInput) {
     startTransition(async () => {
-      try {
-        const formData = transformTaskFormToData(data);
-        if (isEdit && task) {
-          await updateTask(task.id, formData);
-          toast.success("Project updated");
-        } else {
-          await createTask(featureId, formData);
-          toast.success("Project created");
-        }
-        setOpen(false);
-        form.reset();
-        onSuccess?.();
-      } catch (error) {
-        console.error(error);
-        toast.error(
-          isEdit ? "Failed to update project" : "Failed to create project",
-        );
+      const formData = transformTaskFormToData(data);
+      if (isEdit && task) {
+        const { error } = await updateTask(task.id, formData);
+        if (error) toast.error(error);
+        else toast.success("Project updated");
+      } else {
+        const { error } = await createTask(featureId, formData);
+        if (error) toast.error(error);
+        else toast.success("Project created");
       }
+      setOpen(false);
+      form.reset();
+      onSuccess?.();
     });
   }
 

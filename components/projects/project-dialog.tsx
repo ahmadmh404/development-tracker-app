@@ -71,8 +71,9 @@ export function ProjectDialog({
       try {
         const formData = transformProjectFormToData(data);
         if (isEdit && project) {
-          await updateProject(project.id, formData);
-          toast.success("Project updated");
+          const { error } = await updateProject(project.id, formData);
+          if (error) toast.error(error);
+          else toast.success("Project updated");
         } else {
           await createProject(formData);
           toast.success("Project created");

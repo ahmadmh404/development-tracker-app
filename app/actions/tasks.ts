@@ -62,7 +62,7 @@ export async function createTask(featureId: string, data: TaskFormData) {
 
   revalidatePath(`/projects/${feature.projectId}`);
   revalidatePath(`/projects/${feature.projectId}/features/${featureId}`);
-  return task;
+  return { error: null };
 }
 
 export async function updateTask(id: string, data: Partial<TaskFormData>) {

@@ -61,7 +61,8 @@ export async function updateProject(
 
   revalidatePath("/projects");
   revalidatePath(`/projects/${id}`);
-  return project;
+
+  return { error: null };
 }
 
 export async function deleteProject(id: string) {
