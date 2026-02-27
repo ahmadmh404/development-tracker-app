@@ -1,43 +1,12 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { eq, desc } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { decisionSchema, type DecisionFormData } from "@/lib/validations";
-import { decisions, features, projects } from "@/lib/db/schema";
-
-// ═══════════════════════════════════════════════════════════════
-// READ OPERATIONS
-// ═══════════════════════════════════════════════════════════════
-
-export async function getDecisionById(id: string) {
-  return db.query.decisions.findFirst({
-    where: eq(decisions.id, id),
-    columns: { id: true, featureId: true },
-    with: { feature: { columns: { projectId: true } } },
-  });
-}
-
-export async function getDecisionsByFeatureId(featureId: string) {
-  return db.query.decisions.findMany({
-    where: eq(decisions.featureId, featureId),
-    orderBy: [desc(decisions.date)],
-  });
-}
-
-export async function getRecentDecisions(limit: number = 10) {
-  return db.query.decisions.findMany({
-    limit,
-    with: {
-      feature: {
-        with: {
-          project: true,
-        },
-      },
-    },
-    orderBy: [desc(decisions.date)],
-  });
-}
+import { decisions, projects } from "@/lib/db/schema";
+import { getDecisionById } from "@/lib/queries/decisions";
+import { getFeatureById } from "@/lib/queries/features";
 
 // ═══════════════════════════════════════════════════════════════
 // WRITE OPERATIONS
@@ -50,11 +19,9 @@ export async function createDecision(
   const validated = decisionSchema.parse(data);
 
   // Get feature to find project for revalidation
-  const feature = await db.query.features.findFirst({
-    where: eq(features.id, featureId),
-  });
+  const feature = await getFeatureById(featureId);
 
-  if (!feature) throw new Error("Feature not found");
+  if (!feature) return { error: "Feature not found" };
 
   const [decision] = await db
     .insert(decisions)
@@ -76,7 +43,8 @@ export async function createDecision(
 
   revalidatePath(`/projects/${feature.projectId}`);
   revalidatePath(`/projects/${feature.projectId}/features/${featureId}`);
-  return decision;
+
+  return { decision, error: null };
 }
 
 export async function updateDecision(
@@ -84,13 +52,18 @@ export async function updateDecision(
   data: Partial<DecisionFormData>,
 ) {
   const existingDecision = await getDecisionById(id);
-  if (!existingDecision) throw new Error("Decision not found");
+  if (!existingDecision) return { error: "Decision not found" };
+
+  const validated = decisionSchema.partial().parse(data);
 
   const [decision] = await db
     .update(decisions)
     .set({
-      ...data,
+      ...validated,
       date: data.date ? new Date(data.date) : undefined,
+      pros: validated.pros ?? [],
+      cons: validated.cons ?? [],
+      alternatives: validated.alternatives ?? null,
     })
     .where(eq(decisions.id, id))
     .returning();
@@ -105,12 +78,13 @@ export async function updateDecision(
   revalidatePath(
     `/projects/${existingDecision.feature.projectId}/features/${existingDecision.featureId}`,
   );
-  return decision;
+
+  return { error: null };
 }
 
 export async function deleteDecision(id: string) {
   const existingDecision = await getDecisionById(id);
-  if (!existingDecision) throw new Error("Decision not found");
+  if (!existingDecision) return { error: "Decision not found" };
 
   await db.delete(decisions).where(eq(decisions.id, id));
 
@@ -121,4 +95,6 @@ export async function deleteDecision(id: string) {
     .where(eq(projects.id, existingDecision.feature.projectId));
 
   revalidatePath(`/projects/${existingDecision.feature.projectId}`);
+
+  return { error: null };
 }

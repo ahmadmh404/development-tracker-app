@@ -4,8 +4,8 @@ import { z } from "zod";
 export const decisionSchema = z.object({
   text: z.string().min(1, "Decision text is required"),
   date: z.date().nullable(),
-  pros: z.array(z.string()),
-  cons: z.array(z.string()),
+  pros: z.array(z.string()).nullable(),
+  cons: z.array(z.string()).nullable(),
   alternatives: z.string().nullable(),
 });
 

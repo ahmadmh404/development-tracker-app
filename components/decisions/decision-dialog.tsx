@@ -31,7 +31,7 @@ import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field";
 interface DecisionDialogProps {
   featureId: string;
   children: ReactNode;
-  decision?: Decision;
+  decision?: Omit<Decision, "createdAt">;
   mode?: "create" | "edit";
   onSuccess?: () => void;
 }
@@ -62,24 +62,19 @@ export function DecisionDialog({
 
   function onSubmit(data: DecisionFormInput) {
     startTransition(async () => {
-      try {
-        const formData = transformDecisionFormToData(data);
-        if (isEdit && decision) {
-          await updateDecision(decision.id, formData);
-          toast.success("Decision updated");
-        } else {
-          await createDecision(featureId, formData);
-          toast.success("Decision created");
-        }
-        setOpen(false);
-        form.reset();
-        onSuccess?.();
-      } catch (error) {
-        console.error(error);
-        toast.error(
-          isEdit ? "Failed to update Decision" : "Failed to create Decision",
-        );
+      const formData = transformDecisionFormToData(data);
+      if (isEdit && decision) {
+        const { error } = await updateDecision(decision.id, formData);
+        if (error) toast.error(error);
+        else toast.success("Decision updated");
+      } else {
+        const { error } = await createDecision(featureId, formData);
+        if (error) toast.error(error);
+        else toast.success("Decision created");
       }
+      setOpen(false);
+      form.reset();
+      onSuccess?.();
     });
   }
 

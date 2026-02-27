@@ -5,17 +5,8 @@ import { features, projects } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { featureSchema, type FeatureFormData } from "@/lib/validations";
-
-// ═══════════════════════════════════════════════════════════════
-// READ OPERATIONS
-// ═══════════════════════════════════════════════════════════════
-
-export async function getFeatureById(id: string) {
-  return db.query.features.findFirst({
-    where: eq(features.id, id),
-    columns: { projectId: true },
-  });
-}
+import { getProjectById } from "@/lib/queries/projects";
+import { getFeatureById } from "@/lib/queries/features";
 
 export async function getFeaturesByProjectId(projectId: string) {
   return db.query.features.findMany({
@@ -33,6 +24,9 @@ export async function getFeaturesByProjectId(projectId: string) {
 // ═══════════════════════════════════════════════════════════════
 
 export async function createFeature(projectId: string, data: FeatureFormData) {
+  const existingProject = await getProjectById(projectId);
+  if (existingProject == null) return { error: "Project not found" };
+
   const validated = featureSchema.parse(data);
 
   const [feature] = await db
@@ -54,7 +48,8 @@ export async function createFeature(projectId: string, data: FeatureFormData) {
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/projects/${projectId}/features`);
-  return feature;
+
+  return { error: null };
 }
 
 export async function updateFeature(
@@ -78,7 +73,7 @@ export async function updateFeature(
 
   revalidatePath(`/projects/${existingFeature.projectId}`);
   revalidatePath(`/projects/${existingFeature.projectId}/features/${id}`);
-  return feature;
+  return { error: null };
 }
 
 export async function deleteFeature(id: string) {
@@ -94,6 +89,8 @@ export async function deleteFeature(id: string) {
     .where(eq(projects.id, existingFeature.projectId));
 
   revalidatePath(`/projects/${existingFeature.projectId}`);
+
+  return { error: null };
 }
 
 // update feature's name
