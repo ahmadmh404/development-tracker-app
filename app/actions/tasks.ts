@@ -67,7 +67,7 @@ export async function createTask(featureId: string, data: TaskFormData) {
 
 export async function updateTask(id: string, data: Partial<TaskFormData>) {
   const existingTask = await getTaskById(id);
-  if (!existingTask) throw new Error("Task not found");
+  if (!existingTask) return { error: "Task not found" };
 
   const [task] = await db
     .update(tasks)
@@ -88,12 +88,12 @@ export async function updateTask(id: string, data: Partial<TaskFormData>) {
   revalidatePath(
     `/projects/${existingTask.feature.projectId}/features/${existingTask.featureId}`,
   );
-  return task;
+  return { task, error: null };
 }
 
 export async function deleteTask(id: string) {
   const existingTask = await getTaskById(id);
-  if (!existingTask) throw new Error("Task not found");
+  if (!existingTask) return { error: "Task not found" };
 
   await db.delete(tasks).where(eq(tasks.id, id));
 
@@ -104,6 +104,8 @@ export async function deleteTask(id: string) {
     .where(eq(projects.id, existingTask.feature.projectId));
 
   revalidatePath(`/projects/${existingTask.feature.projectId}`);
+
+  return { error: null };
 }
 
 // ═══════════════════════════════════════════════════════════════

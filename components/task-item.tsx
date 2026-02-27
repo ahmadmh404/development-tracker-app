@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Calendar, Edit2, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,8 @@ import { cn } from "@/lib/utils";
 import { tasks } from "@/lib/db/schema";
 import { TaskDialog } from "./tasks/task-dialog";
 import { DeleteDialog } from "./delete-dialog";
-import { deleteTask } from "@/app/actions/tasks";
+import { deleteTask, updateTask } from "@/app/actions/tasks";
+import { toast } from "sonner";
 
 interface TaskItemProps {
   featureId: string;
@@ -18,12 +19,23 @@ interface TaskItemProps {
 
 export function TaskItem({ featureId, task }: TaskItemProps) {
   const [isDone, setIsDone] = useState(task.status === "Done");
+  const [isPending, startTransition] = useTransition();
+
+  function handleTasStatusChange(isDone: boolean) {
+    startTransition(async () => {
+      const { error } = await updateTask(task.id, {
+        status: isDone ? "Done" : task.status,
+      });
+
+      if (error) toast.error(error);
+    });
+  }
 
   return (
     <div className="flex items-start gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/50">
       <Checkbox
         checked={isDone}
-        onCheckedChange={(checked) => setIsDone(checked as boolean)}
+        onCheckedChange={handleTasStatusChange}
         className="mt-1"
       />
 

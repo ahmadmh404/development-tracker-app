@@ -54,7 +54,7 @@ export async function createDecision(
     where: eq(features.id, featureId),
   });
 
-  if (!feature) throw new Error("Feature not found");
+  if (!feature) return { error: "Feature not found" };
 
   const [decision] = await db
     .insert(decisions)
@@ -76,7 +76,8 @@ export async function createDecision(
 
   revalidatePath(`/projects/${feature.projectId}`);
   revalidatePath(`/projects/${feature.projectId}/features/${featureId}`);
-  return decision;
+
+  return { decision, error: null };
 }
 
 export async function updateDecision(
@@ -84,7 +85,7 @@ export async function updateDecision(
   data: Partial<DecisionFormData>,
 ) {
   const existingDecision = await getDecisionById(id);
-  if (!existingDecision) throw new Error("Decision not found");
+  if (!existingDecision) return { error: "Decision not found" };
 
   const [decision] = await db
     .update(decisions)
@@ -105,12 +106,13 @@ export async function updateDecision(
   revalidatePath(
     `/projects/${existingDecision.feature.projectId}/features/${existingDecision.featureId}`,
   );
-  return decision;
+
+  return { error: null };
 }
 
 export async function deleteDecision(id: string) {
   const existingDecision = await getDecisionById(id);
-  if (!existingDecision) throw new Error("Decision not found");
+  if (!existingDecision) return { error: "Decision not found" };
 
   await db.delete(decisions).where(eq(decisions.id, id));
 
@@ -121,4 +123,6 @@ export async function deleteDecision(id: string) {
     .where(eq(projects.id, existingDecision.feature.projectId));
 
   revalidatePath(`/projects/${existingDecision.feature.projectId}`);
+
+  return { error: null };
 }

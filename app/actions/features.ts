@@ -78,7 +78,7 @@ export async function updateFeature(
 
   revalidatePath(`/projects/${existingFeature.projectId}`);
   revalidatePath(`/projects/${existingFeature.projectId}/features/${id}`);
-  return feature;
+  return { error: null };
 }
 
 export async function deleteFeature(id: string) {
@@ -94,6 +94,8 @@ export async function deleteFeature(id: string) {
     .where(eq(projects.id, existingFeature.projectId));
 
   revalidatePath(`/projects/${existingFeature.projectId}`);
+
+  return { error: null };
 }
 
 // update feature's name
