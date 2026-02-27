@@ -1,6 +1,8 @@
 "use server";
 
-import { db, tasks, features, projects } from "@/lib/db";
+import { db } from "@/lib/db";
+import { features, projects, tasks } from "@/lib/db/schema";
+
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { taskSchema, type TaskFormData } from "@/lib/validations";

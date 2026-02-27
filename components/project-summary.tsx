@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { calculateProgress } from "@/app/actions/projects";
-import { Feature, features, Project, projects, Task, tasks } from "@/lib/db";
+import { Feature, Project, Task } from "@/lib/db/schema";
 
 interface ProjectSummaryProps {
   project: Omit<

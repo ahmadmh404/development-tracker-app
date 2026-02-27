@@ -1,9 +1,10 @@
 "use server";
 
-import { db, decisions, features, projects } from "@/lib/db";
+import { db } from "@/lib/db";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { decisionSchema, type DecisionFormData } from "@/lib/validations";
+import { decisions, features, projects } from "@/lib/db/schema";
 
 // ═══════════════════════════════════════════════════════════════
 // READ OPERATIONS

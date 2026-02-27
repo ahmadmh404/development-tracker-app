@@ -1,6 +1,7 @@
 "use server";
 
-import { db, features, projects } from "@/lib/db";
+import { db } from "@/lib/db";
+import { features, projects } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { featureSchema, type FeatureFormData } from "@/lib/validations";

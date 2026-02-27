@@ -1,6 +1,6 @@
 "use client";
 
-import { Project } from "@/lib/db";
+import { Project } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 import { SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";

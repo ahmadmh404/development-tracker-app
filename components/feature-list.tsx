@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { FeatureStatus, Priority } from "@/types";
-import { Feature, tasks } from "@/lib/db";
+import { Feature, tasks } from "@/lib/db/schema";
 import { calculateProgress } from "@/app/actions/projects";
 import { EmptyState } from "@/components/empty-state";
 import { FeatureDialog } from "./features/feature-dialog";

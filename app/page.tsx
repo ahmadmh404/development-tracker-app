@@ -18,8 +18,7 @@ import {
 } from "@/components/ui/card";
 import { ProjectSummary } from "@/components/project-summary";
 import { ProjectDialog } from "@/components/projects/project-dialog";
-import { db, projects, tasks } from "@/lib/db";
-import { desc, eq } from "drizzle-orm";
+import { db } from "@/lib/db";
 import { cacheTag } from "next/cache";
 import {
   DashboardStatsLoading,

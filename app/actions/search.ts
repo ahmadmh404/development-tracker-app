@@ -1,6 +1,8 @@
 "use server";
 
-import { db, projects, features } from "@/lib/db";
+import { db } from "@/lib/db";
+import { features, projects } from "@/lib/db/schema";
+
 import { sql, desc } from "drizzle-orm";
 import type { Project, Feature } from "@/lib/db/schema";
 import { MIN_SEARCH_LENGTH, SEARCH_MAX_RESULTS } from "@/lib/constants";

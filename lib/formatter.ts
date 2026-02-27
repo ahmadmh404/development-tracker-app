@@ -1,4 +1,4 @@
-import { tasks as tasksTable } from "./db";
+import { tasks as tasksTable } from "./db/schema";
 
 // Helper function to calculate progress percentage
 export function calculateProgress(

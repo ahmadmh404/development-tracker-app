@@ -1,9 +1,10 @@
 "use server";
 
 import { cacheTag } from "next/cache";
-import { db, projects } from "@/lib/db";
+import { db } from "@/lib/db";
+import { Project, projects } from "@/lib/db/schema";
+
 import { desc, eq } from "drizzle-orm";
-import { Project } from "@/lib/db";
 
 export async function getProjects(): Promise<
   Pick<Project, "id" | "name" | "status">[]

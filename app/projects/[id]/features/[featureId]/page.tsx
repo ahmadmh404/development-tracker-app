@@ -20,7 +20,9 @@ import {
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { DecisionDialog } from "@/components/decisions/decision-dialog";
 import { cacheTag } from "next/cache";
-import { db, decisions, features, projects, tasks } from "@/lib/db";
+import { db } from "@/lib/db";
+import { features, projects, tasks, decisions } from "@/lib/db/schema";
+
 import { eq } from "drizzle-orm";
 import { EditableTitle } from "@/components/editable-title";
 import { cn } from "@/lib/utils";

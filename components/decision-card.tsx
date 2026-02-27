@@ -3,7 +3,7 @@
 import { Calendar, ThumbsUp, ThumbsDown, GitBranch } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { decisions } from "@/lib/db";
+import { decisions } from "@/lib/db/schema";
 
 interface DecisionCardProps {
   decision: Omit<typeof decisions.$inferSelect, "createdAt">;

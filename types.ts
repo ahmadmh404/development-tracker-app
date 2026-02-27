@@ -5,7 +5,7 @@ import {
   taskStatuses,
 } from "./lib/validations";
 
-import { Task, Decision, Feature, Project } from "./lib/db";
+import { Task, Decision, Feature, Project } from "./lib/db/schema";
 
 export type TaskStatus = (typeof taskStatuses)[number];
 export type Priority = (typeof priorities)[number];

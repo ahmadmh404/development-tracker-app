@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { tasks } from "@/lib/db";
+import { tasks } from "@/lib/db/schema";
 import { TaskDialog } from "./tasks/task-dialog";
 import { DeleteDialog } from "./delete-dialog";
 import { deleteTask } from "@/app/actions/tasks";

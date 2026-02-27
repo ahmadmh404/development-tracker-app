@@ -15,7 +15,7 @@ import { FeatureList } from "@/components/feature-list";
 import { DecisionCard } from "@/components/decision-card";
 import { FeatureDialog } from "@/components/features/feature-dialog";
 import { EditableTitle } from "@/components/editable-title";
-import { db, decisions, features, projects } from "@/lib/db";
+import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { cacheTag } from "next/cache";
 import {
@@ -25,6 +25,7 @@ import {
 } from "@/components/loading";
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
+import { features, projects } from "@/lib/db/schema";
 
 export default function ProjectDetailPage(props: PageProps<"/projects/[id]">) {
   return (

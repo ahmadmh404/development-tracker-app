@@ -1,5 +1,7 @@
 import "dotenv/config";
-import { db, projects, features, tasks, decisions } from "./index";
+import { db } from "./index";
+import { features, projects, tasks, decisions } from "@/lib/db/schema";
+
 import { mockProjects, mockDecisions } from "../mockData";
 
 async function seed() {
