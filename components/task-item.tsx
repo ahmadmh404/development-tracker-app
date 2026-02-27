@@ -18,13 +18,12 @@ interface TaskItemProps {
 }
 
 export function TaskItem({ featureId, task }: TaskItemProps) {
-  const [isDone, setIsDone] = useState(task.status === "Done");
   const [isPending, startTransition] = useTransition();
 
   function handleTasStatusChange(isDone: boolean) {
     startTransition(async () => {
       const { error } = await updateTask(task.id, {
-        status: isDone ? "Done" : task.status,
+        status: isDone ? "Done" : "To Do",
       });
 
       if (error) toast.error(error);
@@ -32,11 +31,18 @@ export function TaskItem({ featureId, task }: TaskItemProps) {
   }
 
   return (
-    <div className="flex items-start gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/50">
+    <div
+      className={cn(
+        "flex items-start gap-4 rounded-lg border border-border bg-card p-4 transition-all",
+        "hover:border-primary/50",
+        isPending && "opacity-60 pointer-events-none grayscale-[0.5]",
+      )}
+    >
       <Checkbox
-        checked={isDone}
+        disabled={isPending}
+        checked={task.status === "Done"}
         onCheckedChange={handleTasStatusChange}
-        className="mt-1"
+        className="mt-1 cursor-pointer"
       />
 
       <div className="flex-1 space-y-2">
@@ -45,7 +51,7 @@ export function TaskItem({ featureId, task }: TaskItemProps) {
             <h4
               className={cn(
                 "font-medium leading-tight",
-                isDone && "text-muted-foreground line-through",
+                task.status === "Done" && "text-muted-foreground line-through",
               )}
             >
               {task.title}

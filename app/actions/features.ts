@@ -5,18 +5,8 @@ import { features, projects } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { featureSchema, type FeatureFormData } from "@/lib/validations";
-import { getProjectById } from "./projects";
-
-// ═══════════════════════════════════════════════════════════════
-// READ OPERATIONS
-// ═══════════════════════════════════════════════════════════════
-
-export async function getFeatureById(id: string) {
-  return db.query.features.findFirst({
-    where: eq(features.id, id),
-    columns: { projectId: true },
-  });
-}
+import { getProjectById } from "@/lib/queries/projects";
+import { getFeatureById } from "@/lib/queries/features";
 
 export async function getFeaturesByProjectId(projectId: string) {
   return db.query.features.findMany({

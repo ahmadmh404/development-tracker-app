@@ -1,43 +1,12 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { eq, desc } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { decisionSchema, type DecisionFormData } from "@/lib/validations";
-import { decisions, features, projects } from "@/lib/db/schema";
-
-// ═══════════════════════════════════════════════════════════════
-// READ OPERATIONS
-// ═══════════════════════════════════════════════════════════════
-
-export async function getDecisionById(id: string) {
-  return db.query.decisions.findFirst({
-    where: eq(decisions.id, id),
-    columns: { id: true, featureId: true },
-    with: { feature: { columns: { projectId: true } } },
-  });
-}
-
-export async function getDecisionsByFeatureId(featureId: string) {
-  return db.query.decisions.findMany({
-    where: eq(decisions.featureId, featureId),
-    orderBy: [desc(decisions.date)],
-  });
-}
-
-export async function getRecentDecisions(limit: number = 10) {
-  return db.query.decisions.findMany({
-    limit,
-    with: {
-      feature: {
-        with: {
-          project: true,
-        },
-      },
-    },
-    orderBy: [desc(decisions.date)],
-  });
-}
+import { decisions, projects } from "@/lib/db/schema";
+import { getDecisionById } from "@/lib/queries/decisions";
+import { getFeatureById } from "@/lib/queries/features";
 
 // ═══════════════════════════════════════════════════════════════
 // WRITE OPERATIONS
@@ -50,9 +19,7 @@ export async function createDecision(
   const validated = decisionSchema.parse(data);
 
   // Get feature to find project for revalidation
-  const feature = await db.query.features.findFirst({
-    where: eq(features.id, featureId),
-  });
+  const feature = await getFeatureById(featureId);
 
   if (!feature) return { error: "Feature not found" };
 

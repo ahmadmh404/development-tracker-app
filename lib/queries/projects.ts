@@ -17,6 +17,18 @@ export async function getProjects(): Promise<
   });
 }
 
+export async function getProjectById(id: string) {
+  return db.query.projects.findFirst({
+    where: eq(projects.id, id),
+    with: {
+      features: {
+        columns: {},
+        with: { tasks: { columns: { status: true } } },
+      },
+    },
+  });
+}
+
 export async function getActiveProject(): Promise<{ id: string } | null> {
   "use cache";
   cacheTag("active-projects");

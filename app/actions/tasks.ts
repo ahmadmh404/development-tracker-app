@@ -2,33 +2,10 @@
 
 import { db } from "@/lib/db";
 import { features, projects, tasks } from "@/lib/db/schema";
-
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { taskSchema, type TaskFormData } from "@/lib/validations";
-
-// ═══════════════════════════════════════════════════════════════
-// READ OPERATIONS
-// ═══════════════════════════════════════════════════════════════
-
-export async function getTaskById(id: string) {
-  return db.query.tasks.findFirst({
-    where: eq(tasks.id, id),
-    columns: { featureId: true },
-    with: {
-      feature: {
-        columns: { projectId: true },
-      },
-    },
-  });
-}
-
-export async function getTasksByFeatureId(featureId: string) {
-  return db.query.tasks.findMany({
-    where: eq(tasks.featureId, featureId),
-    orderBy: (tasks, { asc }) => [asc(tasks.createdAt)],
-  });
-}
+import { getTaskById } from "@/lib/queries/tasks";
 
 // ═══════════════════════════════════════════════════════════════
 // WRITE OPERATIONS
@@ -88,6 +65,7 @@ export async function updateTask(id: string, data: Partial<TaskFormData>) {
   revalidatePath(
     `/projects/${existingTask.feature.projectId}/features/${existingTask.featureId}`,
   );
+
   return { task, error: null };
 }
 
@@ -111,13 +89,3 @@ export async function deleteTask(id: string) {
 // ═══════════════════════════════════════════════════════════════
 // HELPER FUNCTIONS
 // ═══════════════════════════════════════════════════════════════
-
-export async function calculateTaskProgress(
-  featureId: string,
-): Promise<number> {
-  const tasksList = await getTasksByFeatureId(featureId);
-  if (tasksList.length === 0) return 0;
-
-  const completedTasks = tasksList.filter((t) => t.status === "Done").length;
-  return Math.round((completedTasks / tasksList.length) * 100);
-}

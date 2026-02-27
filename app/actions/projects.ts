@@ -6,22 +6,7 @@ import { projects } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { projectSchema, type ProjectFormData } from "@/lib/validations";
-
-// ═══════════════════════════════════════════════════════════════
-// READ OPERATIONS
-// ═══════════════════════════════════════════════════════════════
-
-export async function getProjectById(id: string) {
-  return db.query.projects.findFirst({
-    where: eq(projects.id, id),
-    with: {
-      features: {
-        columns: {},
-        with: { tasks: { columns: { status: true } } },
-      },
-    },
-  });
-}
+import { getProjectById } from "@/lib/queries/projects";
 
 // ═══════════════════════════════════════════════════════════════
 // WRITE OPERATIONS
