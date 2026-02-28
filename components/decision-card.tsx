@@ -15,8 +15,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { decisions } from "@/lib/db/schema";
+import { Decision } from "@/lib/db/schema";
 import { DecisionDialog } from "./decisions/decision-dialog";
 import { DeleteDialog } from "./delete-dialog";
 import { Button } from "@/components/ui/button";
@@ -29,13 +28,13 @@ import {
 } from "./ui/dropdown-menu";
 
 interface DecisionCardProps {
-  decision: Omit<typeof decisions.$inferSelect, "createdAt">;
+  decision: Omit<Decision, "createdAt">;
   featureId: string;
 }
 
 export function DecisionCard({ decision, featureId }: DecisionCardProps) {
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-md">
+    <Card className="group overflow-hidden transition-all hover:shadow-md">
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
         <div className="space-y-1 pr-4">
           <p className="font-medium leading-tight tracking-tight text-base">
@@ -44,38 +43,7 @@ export function DecisionCard({ decision, featureId }: DecisionCardProps) {
         </div>
 
         {/* Actions Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-              <MoreVertical className="h-4 w-4" />
-              <span className="sr-only">Actions</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[160px]">
-            <DecisionDialog
-              featureId={featureId}
-              decision={decision}
-              mode="edit"
-            >
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                <Edit2 className="mr-2 h-4 w-4" /> Edit
-              </DropdownMenuItem>
-            </DecisionDialog>
-
-            <DeleteDialog
-              title="Delete Decision"
-              description="This action cannot be undone."
-              onConfirm={deleteDecision.bind(null, decision.id)}
-            >
-              <DropdownMenuItem
-                onSelect={(e) => e.preventDefault()}
-                variant="destructive"
-              >
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
-              </DropdownMenuItem>
-            </DeleteDialog>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <DecisionActionsDropdown featureId={featureId} decision={decision} />
       </CardHeader>
 
       <CardContent className="grid gap-6">
@@ -127,5 +95,50 @@ export function DecisionCard({ decision, featureId }: DecisionCardProps) {
         </div>
       </CardFooter>
     </Card>
+  );
+}
+
+interface DecisionActionsDropdownProps {
+  featureId: string;
+  decision: Omit<Decision, "createdAt">;
+}
+
+function DecisionActionsDropdown({
+  decision,
+  featureId,
+}: DecisionActionsDropdownProps) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+        >
+          <MoreVertical className="h-4 w-4" />
+          <span className="sr-only">Actions</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[160px]">
+        <DecisionDialog featureId={featureId} decision={decision} mode="edit">
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <Edit2 className="mr-2 h-4 w-4" /> Edit
+          </DropdownMenuItem>
+        </DecisionDialog>
+
+        <DeleteDialog
+          title="Delete Decision"
+          description="This action cannot be undone."
+          onConfirm={deleteDecision.bind(null, decision.id)}
+        >
+          <DropdownMenuItem
+            onSelect={(e) => e.preventDefault()}
+            variant="destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" /> Delete
+          </DropdownMenuItem>
+        </DeleteDialog>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
