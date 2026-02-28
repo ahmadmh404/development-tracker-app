@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { tasks } from "@/lib/db/schema";
+import { Task, tasks } from "@/lib/db/schema";
 import { TaskDialog } from "./tasks/task-dialog";
 import { DeleteDialog } from "./delete-dialog";
 import { deleteTask, updateTask } from "@/app/actions/tasks";
@@ -27,7 +27,7 @@ import { toast } from "sonner";
 
 interface TaskItemProps {
   featureId: string;
-  task: Omit<typeof tasks.$inferSelect, "createdAt">;
+  task: Omit<Task, "createdAt">;
 }
 
 export function TaskItem({ featureId, task }: TaskItemProps) {
@@ -88,36 +88,7 @@ export function TaskItem({ featureId, task }: TaskItemProps) {
           </div>
 
           {/* Clean Actions Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-              >
-                <MoreVertical className="h-4 w-4 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <TaskDialog featureId={featureId} task={task}>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  <Edit2 className="mr-2 h-4 w-4" /> Edit Task
-                </DropdownMenuItem>
-              </TaskDialog>
-              <DeleteDialog
-                title="Delete Task"
-                description="This will permanently remove this task."
-                onConfirm={deleteTask.bind(null, task.id)}
-              >
-                <DropdownMenuItem
-                  onSelect={(e) => e.preventDefault()}
-                  variant="destructive"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" /> Delete
-                </DropdownMenuItem>
-              </DeleteDialog>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <TaskActionsDropdown featureId={featureId} task={task} />
         </div>
 
         {/* Footer Badges */}
@@ -144,5 +115,45 @@ export function TaskItem({ featureId, task }: TaskItemProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+interface TaskActionsDropdownProps {
+  featureId: string;
+  task: Omit<Task, "createdAt">;
+}
+
+function TaskActionsDropdown({ featureId, task }: TaskActionsDropdownProps) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+        >
+          <MoreVertical className="h-4 w-4 text-muted-foreground" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-40">
+        <TaskDialog featureId={featureId} task={task}>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <Edit2 className="mr-2 h-4 w-4" /> Edit Task
+          </DropdownMenuItem>
+        </TaskDialog>
+        <DeleteDialog
+          title="Delete Task"
+          description="This will permanently remove this task."
+          onConfirm={deleteTask.bind(null, task.id)}
+        >
+          <DropdownMenuItem
+            onSelect={(e) => e.preventDefault()}
+            variant="destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" /> Delete
+          </DropdownMenuItem>
+        </DeleteDialog>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

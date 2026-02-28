@@ -4,6 +4,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { AppBreadcrumb } from "./app-breadcrumb";
 import { SearchInput } from "./search/search-input";
+import { ThemeToggle } from "./theme-toggle";
 
 export function AppHeader() {
   return (
@@ -13,6 +14,7 @@ export function AppHeader() {
       <AppBreadcrumb items={[]} />
       <div className="flex flex-1 items-center justify-end gap-4">
         <SearchInput />
+        <ThemeToggle />
       </div>
     </header>
   );

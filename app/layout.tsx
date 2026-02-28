@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { AppHeader } from "@/components/app-header";
-
-import "@/styles/globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
+
+import "./globals.css";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -46,18 +48,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
+    <html
+      lang="en"
+      className={`${geist.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
       <body className="font-sans antialiased">
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            <AppHeader />
-            <main className="flex-1 overflow-y-auto p-6">{children}</main>
-          </SidebarInset>
-        </SidebarProvider>
-        {/* <Analytics /> */}
+        <ThemeProvider>
+          <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset>
+              <AppHeader />
+              <main className="flex-1 overflow-y-auto p-6">{children}</main>
+            </SidebarInset>
+          </SidebarProvider>
+          {/* <Analytics /> */}
 
-        <Toaster />
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

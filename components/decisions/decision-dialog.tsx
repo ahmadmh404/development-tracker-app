@@ -27,6 +27,7 @@ import { createDecision, updateDecision } from "@/app/actions/decisions";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface DecisionDialogProps {
   featureId: string;
@@ -94,95 +95,99 @@ export function DecisionDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <Controller
-              name="text"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field>
-                  <FieldLabel>Decision</FieldLabel>
-                  <Textarea
-                    {...field}
-                    placeholder="What did you decide?"
-                    className={fieldState.invalid ? "border-destructive" : ""}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
+        <ScrollArea className="min-h-[50%]">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <Controller
+                name="text"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Decision</FieldLabel>
+                    <Textarea
+                      {...field}
+                      placeholder="What did you decide?"
+                      className={fieldState.invalid ? "border-destructive" : ""}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="pros"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Pros</FieldLabel>
+                    <Textarea
+                      {...field}
+                      value={field.value ?? ""}
+                      placeholder="List benefits (one per line)..."
+                      className={fieldState.invalid ? "border-destructive" : ""}
+                    />
+
+                    <FieldDescription>One benefit per line</FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="cons"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Cons</FieldLabel>
+                    <Textarea
+                      {...field}
+                      placeholder="List benefits (one per line)..."
+                      className={fieldState.invalid ? "border-destructive" : ""}
+                    />
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="alternatives"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Alternatives</FieldLabel>
+                    <Textarea
+                      {...field}
+                      placeholder="What other options did you consider?"
+                      className={fieldState.invalid ? "border-destructive" : ""}
+                    />
+
+                    <FieldDescription>One trade-off per line</FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <Button type="submit" disabled={isPending}>
+                  {isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="pros"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field>
-                  <FieldLabel>Pros</FieldLabel>
-                  <Textarea
-                    {...field}
-                    value={field.value ?? ""}
-                    placeholder="List benefits (one per line)..."
-                    className={fieldState.invalid ? "border-destructive" : ""}
-                  />
-
-                  <FieldDescription>One benefit per line</FieldDescription>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="cons"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field>
-                  <FieldLabel>Cons</FieldLabel>
-                  <Textarea
-                    {...field}
-                    placeholder="List benefits (one per line)..."
-                    className={fieldState.invalid ? "border-destructive" : ""}
-                  />
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="alternatives"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field>
-                  <FieldLabel>Alternatives</FieldLabel>
-                  <Textarea
-                    {...field}
-                    placeholder="What other options did you consider?"
-                    className={fieldState.invalid ? "border-destructive" : ""}
-                  />
-
-                  <FieldDescription>One trade-off per line</FieldDescription>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  Cancel
+                  {isEdit ? "Save Changes" : "Create Project"}
                 </Button>
-              </DialogClose>
-              <Button type="submit" disabled={isPending}>
-                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEdit ? "Save Changes" : "Create Project"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+              </DialogFooter>
+            </form>
+          </Form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
