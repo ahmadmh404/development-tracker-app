@@ -26,6 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { Badge } from "./ui/badge";
 
 interface DecisionCardProps {
   decision: Omit<Decision, "createdAt">;
@@ -88,11 +89,11 @@ export function DecisionCard({ decision, featureId }: DecisionCardProps) {
         )}
       </CardContent>
 
-      <CardFooter className="bg-muted/30 px-6 py-3 border-t">
-        <div className="flex items-center text-xs text-muted-foreground">
+      <CardFooter className="border-t">
+        <Badge variant={"outline"}>
           <Calendar className="mr-1 h-3 w-3" />
           Decided on {new Date(decision.date).toLocaleDateString()}
-        </div>
+        </Badge>
       </CardFooter>
     </Card>
   );
