@@ -27,6 +27,9 @@ import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
 import { features, projects } from "@/lib/db/schema";
 import { getProjects } from "@/lib/queries/projects";
+import { updateProject } from "@/app/actions/projects";
+import { ProjectStatus } from "@/types";
+import ProjectStatusSwitcher from "@/components/projects/project-status-switcher";
 
 export async function generateStaticParams() {
   const projects = await getProjects();
@@ -74,19 +77,10 @@ async function SuspendedPage(props: PageProps<"/projects/[id]">) {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Select defaultValue={project.status}>
-              <SelectTrigger className="w-[160px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Planning">Planning</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Launched">Launched</SelectItem>
-                <SelectItem value="Archived">Archived</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <ProjectStatusSwitcher
+            projectId={project.id}
+            status={project.status}
+          />
         </div>
 
         {/* Tech Stack */}

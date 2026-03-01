@@ -30,6 +30,8 @@ import { FeaturePageLoading } from "@/components/loading";
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
 import { getFeatures } from "@/lib/queries/features";
+import FeaturePrioritySwitcher from "@/components/features/feature-priority-switcher.";
+import FeatureStatusSwitcher from "@/components/features/feature-status-switcher";
 
 export async function generateStaticParams() {
   const features = await getFeatures();
@@ -90,32 +92,18 @@ async function SuspendedPage(
             </p>
           </div>
 
+          {/* Feature Priority and Status */}
           <div className="flex flex-wrap items-center gap-2">
             {/* Filtering with search params */}
-            <Select
-              value={feature.priority}
-              // onValueChange={(v) => setPriority(v as Priority)}
-            >
-              <SelectTrigger className="w-[130px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="High">High</SelectItem>
-                <SelectItem value="Medium">Medium</SelectItem>
-                <SelectItem value="Low">Low</SelectItem>
-              </SelectContent>
-            </Select>
+            <FeaturePrioritySwitcher
+              featureId={feature.id}
+              priority={feature.priority}
+            />
 
-            <Select value={feature.status}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="To Do">To Do</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Done">Done</SelectItem>
-              </SelectContent>
-            </Select>
+            <FeatureStatusSwitcher
+              featureId={feature.id}
+              status={feature.status}
+            />
           </div>
         </div>
 

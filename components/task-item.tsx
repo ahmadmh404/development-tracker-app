@@ -94,20 +94,17 @@ export function TaskItem({ featureId, task }: TaskItemProps) {
         {/* Footer Badges */}
         <div className="flex flex-wrap items-center gap-3 pt-1">
           {task.dueDate && (
-            <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground bg-muted/50 px-2 py-1 rounded-md">
+            <Badge variant={"outline"}>
               <Calendar className="h-3 w-3" />
               {new Date(task.dueDate).toLocaleDateString(undefined, {
                 month: "short",
                 day: "numeric",
               })}
-            </div>
+            </Badge>
           )}
 
           {task.effortEstimate && (
-            <Badge
-              variant="secondary"
-              className="text-[10px] px-2 py-0 h-5 font-bold uppercase tracking-wider"
-            >
+            <Badge variant={"outline"}>
               <Clock className="mr-1 h-2.5 w-2.5" />
               {task.effortEstimate}
             </Badge>

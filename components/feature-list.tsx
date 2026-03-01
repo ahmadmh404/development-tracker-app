@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FeatureStatus, Priority } from "@/types";
+import { FeatureStatus, FeaturePriority } from "@/types";
 import { Feature, tasks } from "@/lib/db/schema";
 import { calculateProgress } from "@/app/actions/projects";
 import { EmptyState } from "@/components/empty-state";
@@ -26,7 +26,7 @@ interface FeatureListProps {
   projectId: string;
 }
 
-function getPriorityColor(priority: Priority) {
+function getPriorityColor(priority: FeaturePriority) {
   switch (priority) {
     case "High":
       return "bg-red-500";
@@ -72,7 +72,7 @@ export function FeatureList({ features, projectId }: FeatureListProps) {
             <TableHead>Priority</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Tasks</TableHead>
-            <TableHead className="w-[100px]">Actions</TableHead>
+            <TableHead className="w-25">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

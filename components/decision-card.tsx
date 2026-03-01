@@ -29,7 +29,7 @@ import {
 
 interface DecisionCardProps {
   decision: Omit<Decision, "createdAt">;
-  featureId: string;
+  featureId?: string;
 }
 
 export function DecisionCard({ decision, featureId }: DecisionCardProps) {
@@ -99,7 +99,7 @@ export function DecisionCard({ decision, featureId }: DecisionCardProps) {
 }
 
 interface DecisionActionsDropdownProps {
-  featureId: string;
+  featureId?: string;
   decision: Omit<Decision, "createdAt">;
 }
 
@@ -107,6 +107,8 @@ function DecisionActionsDropdown({
   decision,
   featureId,
 }: DecisionActionsDropdownProps) {
+  if (featureId == null) return null;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
