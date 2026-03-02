@@ -75,15 +75,6 @@ async function SuspendedPage(props: PageProps<"/projects/[id]">) {
               projectId={project.id}
               status={project.status}
             />
-            <DeleteDialog
-              title="Delete Project"
-              description="This will permanently delete the project and all its features, tasks, and decisions. This action cannot be undone."
-              onConfirm={deleteProject.bind(null, project.id)}
-            >
-              <Button variant="destructive" size="sm">
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
-              </Button>
-            </DeleteDialog>
           </div>
         </div>
 

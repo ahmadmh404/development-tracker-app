@@ -53,7 +53,7 @@ export async function updateProject(
 
 export async function deleteProject(id: string) {
   const existingProject = await getProjectById(id);
-  if (existingProject != null) return { error: "Project not found" };
+  if (existingProject == null) return { error: "Project not found" };
 
   await db.delete(projects).where(eq(projects.id, id));
   revalidateTag("projects", "max");

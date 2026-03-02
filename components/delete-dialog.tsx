@@ -33,7 +33,7 @@ export function DeleteDialog({
   function onDelete() {
     startTransition(async () => {
       try {
-        onConfirm();
+        await onConfirm();
         toast.success("deleted successfully");
       } catch (error) {
         console.log("deletion_error: ", error);
