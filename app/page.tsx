@@ -16,7 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ProjectSummary } from "@/components/project-summary";
+import { ProjectSummary } from "@/components/projects/project-summary";
 import { ProjectDialog } from "@/components/projects/project-dialog";
 import { db } from "@/lib/db";
 import { cacheTag } from "next/cache";

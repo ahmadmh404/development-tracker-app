@@ -14,8 +14,8 @@ import { FeatureStatus, FeaturePriority } from "@/types";
 import { Feature, tasks } from "@/lib/db/schema";
 import { calculateProgress } from "@/app/actions/projects";
 import { EmptyState } from "@/components/empty-state";
-import { FeatureDialog } from "./features/feature-dialog";
-import { DeleteDialog } from "./delete-dialog";
+import { FeatureDialog } from "../features/feature-dialog";
+import { DeleteDialog } from "../delete-dialog";
 import { deleteFeature } from "@/app/actions/features";
 
 interface FeatureListProps {

@@ -4,9 +4,10 @@ import { db } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { projectSchema, type ProjectFormData } from "@/lib/validations";
 import { getProjectById } from "@/lib/queries/projects";
+import { redirect } from "next/navigation";
 
 // ═══════════════════════════════════════════════════════════════
 // WRITE OPERATIONS
@@ -24,7 +25,7 @@ export async function createProject(data: ProjectFormData) {
     })
     .returning();
 
-  revalidatePath("/projects");
+  revalidateTag("projects", "max");
   return project;
 }
 
@@ -44,8 +45,8 @@ export async function updateProject(
     .where(eq(projects.id, id))
     .returning();
 
-  revalidatePath("/projects");
-  revalidatePath(`/projects/${id}`);
+  revalidateTag("projects", "max");
+  revalidateTag(`project-${id}`, "max");
 
   return { error: null };
 }
@@ -55,7 +56,10 @@ export async function deleteProject(id: string) {
   if (existingProject != null) return { error: "Project not found" };
 
   await db.delete(projects).where(eq(projects.id, id));
-  revalidatePath("/projects");
+  revalidateTag("projects", "max");
+  revalidateTag(`project-${id}`, "max");
+
+  redirect("/");
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -87,8 +91,8 @@ export async function editProjectName(id: string, name: string) {
     .where(eq(projects.id, id))
     .returning();
 
-  revalidatePath("/projects");
-  revalidatePath(`/projects/${id}`);
+  revalidateTag("projects", "max");
+  revalidateTag(`project-${id}`, "max");
 
   return { error: null };
 }

@@ -2,16 +2,9 @@ import { Suspense } from "react";
 import { Plus, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { AppBreadcrumb } from "@/components/app-breadcrumb";
-import { TaskItem } from "@/components/task-item";
-import { DecisionCard } from "@/components/decision-card";
+import { TaskItem } from "@/components/tasks/task-item";
+import { DecisionCard } from "@/components/decisions/decision-card";
 import {
   ResizablePanelGroup,
   ResizablePanel,

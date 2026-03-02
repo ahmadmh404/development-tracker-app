@@ -1,18 +1,11 @@
 import { Suspense } from "react";
-import { Plus, Lightbulb } from "lucide-react";
+import { Plus, Lightbulb, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { AppBreadcrumb } from "@/components/app-breadcrumb";
-import { FeatureList } from "@/components/feature-list";
-import { DecisionCard } from "@/components/decision-card";
+import { FeatureList } from "@/components/features/feature-list";
+import { DecisionCard } from "@/components/decisions/decision-card";
 import { FeatureDialog } from "@/components/features/feature-dialog";
 import { EditableTitle } from "@/components/editable-title";
 import { db } from "@/lib/db";
@@ -27,9 +20,9 @@ import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
 import { features, projects } from "@/lib/db/schema";
 import { getProjects } from "@/lib/queries/projects";
-import { updateProject } from "@/app/actions/projects";
-import { ProjectStatus } from "@/types";
+import { deleteProject } from "@/app/actions/projects";
 import ProjectStatusSwitcher from "@/components/projects/project-status-switcher";
+import { DeleteDialog } from "@/components/delete-dialog";
 
 export async function generateStaticParams() {
   const projects = await getProjects();
@@ -77,10 +70,21 @@ async function SuspendedPage(props: PageProps<"/projects/[id]">) {
             </p>
           </div>
 
-          <ProjectStatusSwitcher
-            projectId={project.id}
-            status={project.status}
-          />
+          <div className="flex items-center gap-2">
+            <ProjectStatusSwitcher
+              projectId={project.id}
+              status={project.status}
+            />
+            <DeleteDialog
+              title="Delete Project"
+              description="This will permanently delete the project and all its features, tasks, and decisions. This action cannot be undone."
+              onConfirm={deleteProject.bind(null, project.id)}
+            >
+              <Button variant="destructive" size="sm">
+                <Trash2 className="mr-2 h-4 w-4" /> Delete
+              </Button>
+            </DeleteDialog>
+          </div>
         </div>
 
         {/* Tech Stack */}

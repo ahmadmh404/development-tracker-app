@@ -39,7 +39,7 @@ import { createProject, updateProject } from "@/app/actions/projects";
 
 interface ProjectDialogProps {
   children: ReactNode;
-  project?: Project;
+  project?: Omit<Project, "createdAt">;
   mode?: "create" | "edit";
   onSuccess?: () => void;
 }
@@ -68,25 +68,18 @@ export function ProjectDialog({
 
   function onSubmit(data: ProjectFormInput) {
     startTransition(async () => {
-      try {
-        const formData = transformProjectFormToData(data);
-        if (isEdit && project) {
-          const { error } = await updateProject(project.id, formData);
-          if (error) toast.error(error);
-          else toast.success("Project updated");
-        } else {
-          await createProject(formData);
-          toast.success("Project created");
-        }
-        setOpen(false);
-        form.reset();
-        onSuccess?.();
-      } catch (error) {
-        console.error(error);
-        toast.error(
-          isEdit ? "Failed to update project" : "Failed to create project",
-        );
+      const formData = transformProjectFormToData(data);
+      if (isEdit && project) {
+        const { error } = await updateProject(project.id, formData);
+        if (error) toast.error(error);
+        else toast.success("Project updated");
+      } else {
+        await createProject(formData);
+        toast.success("Project created");
       }
+      setOpen(false);
+      form.reset();
+      onSuccess?.();
     });
   }
 

@@ -16,8 +16,8 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Decision } from "@/lib/db/schema";
-import { DecisionDialog } from "./decisions/decision-dialog";
-import { DeleteDialog } from "./delete-dialog";
+import { DecisionDialog } from "../decisions/decision-dialog";
+import { DeleteDialog } from "../delete-dialog";
 import { Button } from "@/components/ui/button";
 import { deleteDecision } from "@/app/actions/decisions";
 import {
@@ -25,8 +25,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Badge } from "./ui/badge";
+} from "../ui/dropdown-menu";
+import { Badge } from "../ui/badge";
 
 interface DecisionCardProps {
   decision: Omit<Decision, "createdAt">;

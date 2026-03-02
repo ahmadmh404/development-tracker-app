@@ -3,10 +3,11 @@
 import { db } from "@/lib/db";
 import { features, projects } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { featureSchema, type FeatureFormData } from "@/lib/validations";
 import { getProjectById } from "@/lib/queries/projects";
 import { getFeatureById } from "@/lib/queries/features";
+import { redirect } from "next/navigation";
 
 export async function getFeaturesByProjectId(projectId: string) {
   return db.query.features.findMany({
@@ -46,8 +47,7 @@ export async function createFeature(projectId: string, data: FeatureFormData) {
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, projectId));
 
-  revalidatePath(`/projects/${projectId}`);
-  revalidatePath(`/projects/${projectId}/features`);
+  revalidateTag(`project-${projectId}-features`, "max");
 
   return { error: null };
 }
@@ -71,8 +71,9 @@ export async function updateFeature(
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, existingFeature.projectId));
 
-  revalidatePath(`/projects/${existingFeature.projectId}`);
-  revalidatePath(`/projects/${existingFeature.projectId}/features/${id}`);
+  revalidateTag(`feature-${id}`, "max");
+  revalidateTag(`project-${id}-features`, "max");
+
   return { error: null };
 }
 
@@ -88,9 +89,8 @@ export async function deleteFeature(id: string) {
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, existingFeature.projectId));
 
-  revalidatePath(`/projects/${existingFeature.projectId}`);
-
-  return { error: null };
+  revalidateTag(`project-${existingFeature.projectId}`, "amx");
+  redirect(`/projects/${existingFeature.projectId}`);
 }
 
 // update feature's name
@@ -107,8 +107,8 @@ export async function editFeatureName(id: string, name: string) {
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, existingFeature.projectId));
 
-  revalidatePath(`/projects/${existingFeature.projectId}`);
-  revalidatePath(`/projects/${existingFeature.projectId}/features/${id}`);
+  revalidateTag(`feature-${id}`, "max");
+  revalidateTag(`project-${id}-features`, "max");
 
   return { error: null };
 }

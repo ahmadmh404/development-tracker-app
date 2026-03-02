@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Task, tasks } from "@/lib/db/schema";
-import { TaskDialog } from "./tasks/task-dialog";
-import { DeleteDialog } from "./delete-dialog";
+import { TaskDialog } from "../tasks/task-dialog";
+import { DeleteDialog } from "../delete-dialog";
 import { deleteTask, updateTask } from "@/app/actions/tasks";
 import { toast } from "sonner";
 

@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { decisionSchema, type DecisionFormData } from "@/lib/validations";
 import { decisions, projects } from "@/lib/db/schema";
 import { getDecisionById } from "@/lib/queries/decisions";
@@ -41,8 +41,8 @@ export async function createDecision(
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, feature.projectId));
 
-  revalidatePath(`/projects/${feature.projectId}`);
-  revalidatePath(`/projects/${feature.projectId}/features/${featureId}`);
+  revalidateTag(`project-${feature.projectId}`, "amx");
+  revalidateTag(`project-${feature.projectId}-features`, "max");
 
   return { decision, error: null };
 }
@@ -74,9 +74,10 @@ export async function updateDecision(
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, existingDecision.feature.projectId));
 
-  revalidatePath(`/projects/${existingDecision.feature.projectId}`);
-  revalidatePath(
-    `/projects/${existingDecision.feature.projectId}/features/${existingDecision.featureId}`,
+  revalidateTag(`project-${existingDecision.feature.projectId}`, "amx");
+  revalidateTag(
+    `project-${existingDecision.feature.projectId}-features`,
+    "max",
   );
 
   return { error: null };
@@ -94,7 +95,11 @@ export async function deleteDecision(id: string) {
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, existingDecision.feature.projectId));
 
-  revalidatePath(`/projects/${existingDecision.feature.projectId}`);
+  revalidateTag(`project-${existingDecision.feature.projectId}`, "amx");
+  revalidateTag(
+    `project-${existingDecision.feature.projectId}-features`,
+    "max",
+  );
 
   return { error: null };
 }

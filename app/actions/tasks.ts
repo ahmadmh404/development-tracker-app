@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { features, projects, tasks } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { taskSchema, type TaskFormData } from "@/lib/validations";
 import { getTaskById } from "@/lib/queries/tasks";
 
@@ -37,8 +37,9 @@ export async function createTask(featureId: string, data: TaskFormData) {
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, feature.projectId));
 
-  revalidatePath(`/projects/${feature.projectId}`);
-  revalidatePath(`/projects/${feature.projectId}/features/${featureId}`);
+  revalidateTag(`project-${feature.projectId}`, "max");
+  revalidateTag(`project-${feature.projectId}-features`, "max");
+
   return { error: null };
 }
 
@@ -61,10 +62,8 @@ export async function updateTask(id: string, data: Partial<TaskFormData>) {
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, existingTask.feature.projectId));
 
-  revalidatePath(`/projects/${existingTask.feature.projectId}`);
-  revalidatePath(
-    `/projects/${existingTask.feature.projectId}/features/${existingTask.featureId}`,
-  );
+  revalidateTag(`project-${existingTask.feature.projectId}`, "max");
+  revalidateTag(`project-${existingTask.feature.projectId}-features`, "max");
 
   return { task, error: null };
 }
@@ -81,7 +80,7 @@ export async function deleteTask(id: string) {
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, existingTask.feature.projectId));
 
-  revalidatePath(`/projects/${existingTask.feature.projectId}`);
+  revalidateTag(`project-${existingTask.feature.projectId}`, "max");
 
   return { error: null };
 }
