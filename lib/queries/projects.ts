@@ -2,18 +2,34 @@
 
 import { cacheTag } from "next/cache";
 import { db } from "@/lib/db";
-import { Project, projects } from "@/lib/db/schema";
+import { Feature, Project, projects, Task } from "@/lib/db/schema";
 
 import { desc, eq } from "drizzle-orm";
 
-export async function getProjects(): Promise<
-  Pick<Project, "id" | "name" | "status">[]
-> {
+type ProjectsData = Omit<
+  Project & {
+    features: Pick<
+      Feature & {
+        tasks: Pick<Task, "status">[];
+      },
+      "id" | "tasks"
+    >[];
+  },
+  "createdAt"
+>[];
+
+export async function getProjects(): Promise<ProjectsData> {
   "use cache";
   cacheTag("projects");
 
-  return db.query.projects.findMany({
-    columns: { id: true, name: true, status: true },
+  return await db.query.projects.findMany({
+    columns: { createdAt: false },
+    with: {
+      features: {
+        columns: { id: true },
+        with: { tasks: { columns: { status: true } } },
+      },
+    },
   });
 }
 

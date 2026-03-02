@@ -26,6 +26,7 @@ import {
   ProjectsSummaryListLoading,
 } from "@/components/loading";
 import { EmptyState } from "@/components/empty-state";
+import { getProjects } from "@/lib/queries/projects";
 
 export default function DashboardPage() {
   return (
@@ -81,7 +82,7 @@ async function SuspendedDashboard() {
 // Dashboard Stats
 async function DashboardStats() {
   const [totalProject, totalFeatures, allTasks] = await Promise.all([
-    await getAllProjects(),
+    await getProjects(),
     await getTotalFeaturesCount(),
     await getOpenTasksCount(),
   ]);
@@ -172,7 +173,7 @@ async function CurrentProjectCTA() {
 
 // Projects Summary List
 async function ProjectsSummaryList() {
-  const projects = await getAllProjects();
+  const projects = await getProjects();
 
   if (projects.length === 0) {
     return (
@@ -219,20 +220,4 @@ async function getOpenTasksCount() {
   });
 
   return todos;
-}
-
-// get all projects
-async function getAllProjects() {
-  "use cache";
-  cacheTag("projects");
-
-  return await db.query.projects.findMany({
-    columns: { createdAt: false },
-    with: {
-      features: {
-        columns: { id: true },
-        with: { tasks: { columns: { status: true } } },
-      },
-    },
-  });
 }
