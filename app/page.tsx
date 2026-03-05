@@ -28,6 +28,18 @@ import {
 import { EmptyState } from "@/components/empty-state";
 import { getProjects } from "@/lib/queries/projects";
 
+export const metadata = {
+  title: "Dashboard - Personal Dev Tracker",
+  description:
+    "Track your development projects, features, tasks, and decisions in one place.",
+  openGraph: {
+    title: "Dashboard - Personal Dev Tracker",
+    description:
+      "Track your development projects, features, tasks, and decisions in one place.",
+    type: "website",
+  },
+};
+
 export default function DashboardPage() {
   return (
     <Suspense>

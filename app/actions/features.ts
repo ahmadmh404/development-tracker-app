@@ -90,6 +90,7 @@ export async function deleteFeature(id: string) {
     .where(eq(projects.id, existingFeature.projectId));
 
   revalidateTag(`project-${existingFeature.projectId}`, "amx");
+
   redirect(`/projects/${existingFeature.projectId}`);
 }
 

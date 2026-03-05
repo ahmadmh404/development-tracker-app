@@ -26,6 +26,44 @@ import { getFeatures } from "@/lib/queries/features";
 import FeaturePrioritySwitcher from "@/components/features/feature-priority-switcher.";
 import FeatureStatusSwitcher from "@/components/features/feature-status-switcher";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string; featureId: string };
+}) {
+  const project = await getProjectById(params.id);
+  const feature = await getFeatureById(params.featureId);
+
+  if (!project || !feature) {
+    return {
+      title: "Feature Not Found",
+      description:
+        "The feature you're looking for doesn't exist or has been deleted.",
+    };
+  }
+
+  return {
+    title: `${feature.name} - ${project.name} - Personal Dev Tracker`,
+    description: feature.description,
+    openGraph: {
+      title: `${feature.name} - ${project.name} - Personal Dev Tracker`,
+      description: feature.description,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://development-tracker-app.vercel.app"}/projects/${project.id}/features/${feature.id}`,
+      type: "article",
+      publishedTime: new Date().toISOString(),
+      modifiedTime: new Date().toISOString(),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${feature.name} - ${project.name} - Personal Dev Tracker`,
+      description: feature.description,
+    },
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_SITE_URL || "https://development-tracker-app.vercel.app"}/projects/${project.id}/features/${feature.id}`,
+    },
+  };
+}
+
 export async function generateStaticParams() {
   const features = await getFeatures();
 
@@ -60,8 +98,44 @@ async function SuspendedPage(
     );
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: feature.name,
+    description: feature.description,
+    isPartOf: {
+      "@type": "SoftwareApplication",
+      name: project.name,
+    },
+    author: {
+      "@type": "Person",
+      name: "Developer",
+    },
+    additionalProperty: [
+      {
+        "@type": "PropertyValue",
+        name: "Priority",
+        value: feature.priority,
+      },
+      {
+        "@type": "PropertyValue",
+        name: "Status",
+        value: feature.status,
+      },
+      {
+        "@type": "PropertyValue",
+        name: "Effort Estimate",
+        value: feature.effortEstimate,
+      },
+    ],
+  };
+
   return (
     <div className="container mx-auto space-y-6 p-6 md:p-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Breadcrumb */}
       <AppBreadcrumb
         items={[

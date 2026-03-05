@@ -6,13 +6,13 @@ import { Feature, features } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function getFeatures(): Promise<
-  Pick<Feature, "id" | "name" | "status">[]
+  Pick<Feature, "id" | "name" | "status" | "projectId">[]
 > {
   "use cache";
   cacheTag("features");
 
   return db.query.features.findMany({
-    columns: { id: true, name: true, status: true },
+    columns: { id: true, name: true, status: true, projectId: true },
   });
 }
 

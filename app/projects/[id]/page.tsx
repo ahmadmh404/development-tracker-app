@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Plus, Lightbulb, Trash2 } from "lucide-react";
+import { Plus, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,9 +20,40 @@ import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
 import { features, projects } from "@/lib/db/schema";
 import { getProjects } from "@/lib/queries/projects";
-import { deleteProject } from "@/app/actions/projects";
 import ProjectStatusSwitcher from "@/components/projects/project-status-switcher";
-import { DeleteDialog } from "@/components/delete-dialog";
+
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const project = await getProjectById(params.id);
+
+  if (!project) {
+    return {
+      title: "Project Not Found",
+      description:
+        "The project you're looking for doesn't exist or has been deleted.",
+    };
+  }
+
+  return {
+    title: `${project.name} - Personal Dev Tracker`,
+    description: project.description,
+    openGraph: {
+      title: `${project.name} - Personal Dev Tracker`,
+      description: project.description,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://development-tracker-app.vercel.app"}/projects/${project.id}`,
+      type: "article",
+      publishedTime: new Date().toISOString(),
+      modifiedTime: new Date().toISOString(),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.name} - Personal Dev Tracker`,
+      description: project.description,
+    },
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_SITE_URL || "https://development-tracker-app.vercel.app"}/projects/${project.id}`,
+    },
+  };
+}
 
 export async function generateStaticParams() {
   const projects = await getProjects();
@@ -53,8 +84,30 @@ async function SuspendedPage(props: PageProps<"/projects/[id]">) {
     );
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: project.name,
+    description: project.description,
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    author: {
+      "@type": "Person",
+      name: "Developer",
+    },
+  };
+
   return (
     <div className="container mx-auto space-y-6 p-6 md:p-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Breadcrumb */}
       <AppBreadcrumb
         items={[{ label: "Dashboard", href: "/" }, { label: project.name }]}

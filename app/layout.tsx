@@ -18,6 +18,16 @@ const geistMono = Geist_Mono({
   variable: "--font-mono",
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+};
+
 export const metadata: Metadata = {
   title: "Personal Dev Tracker",
   description:
@@ -40,6 +50,24 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-icon.png",
   },
+  openGraph: {
+    title: "Personal Dev Tracker",
+    description:
+      "Track your development projects, features, tasks, and decisions",
+    url:
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      "https://development-tracker-app.vercel.app",
+    siteName: "Personal Dev Tracker",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Personal Dev Tracker",
+    description:
+      "Track your development projects, features, tasks, and decisions",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
