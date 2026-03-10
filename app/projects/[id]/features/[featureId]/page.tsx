@@ -98,44 +98,8 @@ async function SuspendedPage(
     );
   }
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "CreativeWork",
-    name: feature.name,
-    description: feature.description,
-    isPartOf: {
-      "@type": "SoftwareApplication",
-      name: project.name,
-    },
-    author: {
-      "@type": "Person",
-      name: "Developer",
-    },
-    additionalProperty: [
-      {
-        "@type": "PropertyValue",
-        name: "Priority",
-        value: feature.priority,
-      },
-      {
-        "@type": "PropertyValue",
-        name: "Status",
-        value: feature.status,
-      },
-      {
-        "@type": "PropertyValue",
-        name: "Effort Estimate",
-        value: feature.effortEstimate,
-      },
-    ],
-  };
-
   return (
     <div className="container mx-auto space-y-6 p-6 md:p-8">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       {/* Breadcrumb */}
       <AppBreadcrumb
         items={[

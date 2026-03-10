@@ -84,30 +84,8 @@ async function SuspendedPage(props: PageProps<"/projects/[id]">) {
     );
   }
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: project.name,
-    description: project.description,
-    applicationCategory: "DeveloperApplication",
-    operatingSystem: "Web",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
-    author: {
-      "@type": "Person",
-      name: "Developer",
-    },
-  };
-
   return (
     <div className="container mx-auto space-y-6 p-6 md:p-8">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       {/* Breadcrumb */}
       <AppBreadcrumb
         items={[{ label: "Dashboard", href: "/" }, { label: project.name }]}
