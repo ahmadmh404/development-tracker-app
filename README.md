@@ -112,7 +112,7 @@ A modern, **local-first** development tracking tool built with Next.js 16, TypeS
 
 ### التثبيت
 
-1. **استنساخ المستودع**:
+1. **نسخالمستودع**:
    ```bash
    git clone <رابط-المستودع>
    cd project-tracker-app
