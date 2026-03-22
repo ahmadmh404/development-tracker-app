@@ -41,7 +41,7 @@ export async function createDecision(
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, feature.projectId));
 
-  revalidateTag(`project-${feature.projectId}`, "amx");
+  revalidateTag(`project-${feature.projectId}`, "max");
   revalidateTag(`project-${feature.projectId}-features`, "max");
 
   return { decision, error: null };
@@ -74,7 +74,7 @@ export async function updateDecision(
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, existingDecision.feature.projectId));
 
-  revalidateTag(`project-${existingDecision.feature.projectId}`, "amx");
+  revalidateTag(`project-${existingDecision.feature.projectId}`, "max");
   revalidateTag(
     `project-${existingDecision.feature.projectId}-features`,
     "max",
@@ -95,7 +95,7 @@ export async function deleteDecision(id: string) {
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, existingDecision.feature.projectId));
 
-  revalidateTag(`project-${existingDecision.feature.projectId}`, "amx");
+  revalidateTag(`project-${existingDecision.feature.projectId}`, "max");
   revalidateTag(
     `project-${existingDecision.feature.projectId}-features`,
     "max",

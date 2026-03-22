@@ -89,7 +89,7 @@ export async function deleteFeature(id: string) {
     .set({ lastUpdated: new Date() })
     .where(eq(projects.id, existingFeature.projectId));
 
-  revalidateTag(`project-${existingFeature.projectId}`, "amx");
+  revalidateTag(`project-${existingFeature.projectId}`, "max");
   redirect(`/projects/${existingFeature.projectId}`);
 }
 
