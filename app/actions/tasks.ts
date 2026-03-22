@@ -20,16 +20,13 @@ export async function createTask(featureId: string, data: TaskFormData) {
   });
   if (!feature) throw new Error("Feature not found");
 
-  const [task] = await db
-    .insert(tasks)
-    .values({
-      ...validated,
-      featureId,
-      status: validated.status ?? "To Do",
-      dueDate: validated.dueDate ? new Date(validated.dueDate) : null,
-      effortEstimate: validated.effortEstimate ?? null,
-    })
-    .returning();
+  await db.insert(tasks).values({
+    ...validated,
+    featureId,
+    status: validated.status ?? "To Do",
+    dueDate: validated.dueDate ? new Date(validated.dueDate) : null,
+    effortEstimate: validated.effortEstimate ?? null,
+  });
 
   // Update project's lastUpdated timestamp
   await db
@@ -47,14 +44,13 @@ export async function updateTask(id: string, data: Partial<TaskFormData>) {
   const existingTask = await getTaskById(id);
   if (!existingTask) return { error: "Task not found" };
 
-  const [task] = await db
+  await db
     .update(tasks)
     .set({
       ...data,
       dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
     })
-    .where(eq(tasks.id, id))
-    .returning();
+    .where(eq(tasks.id, id));
 
   // Update project's lastUpdated timestamp
   await db
@@ -65,7 +61,7 @@ export async function updateTask(id: string, data: Partial<TaskFormData>) {
   revalidateTag(`project-${existingTask.feature.projectId}`, "max");
   revalidateTag(`project-${existingTask.feature.projectId}-features`, "max");
 
-  return { task, error: null };
+  return { error: null };
 }
 
 export async function deleteTask(id: string) {

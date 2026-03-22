@@ -30,16 +30,13 @@ export async function createFeature(projectId: string, data: FeatureFormData) {
 
   const validated = featureSchema.parse(data);
 
-  const [feature] = await db
-    .insert(features)
-    .values({
-      ...validated,
-      priority: validated.priority ?? "Medium",
-      status: validated.status ?? "To Do",
-      effortEstimate: validated.effortEstimate ?? null,
-      projectId,
-    })
-    .returning();
+  await db.insert(features).values({
+    ...validated,
+    priority: validated.priority ?? "Medium",
+    status: validated.status ?? "To Do",
+    effortEstimate: validated.effortEstimate ?? null,
+    projectId,
+  });
 
   // Update project's lastUpdated timestamp
   await db
@@ -59,11 +56,7 @@ export async function updateFeature(
   const existingFeature = await getFeatureById(id);
   if (!existingFeature) return { error: "Feature not found" };
 
-  const [feature] = await db
-    .update(features)
-    .set(data)
-    .where(eq(features.id, id))
-    .returning();
+  await db.update(features).set(data).where(eq(features.id, id));
 
   // Update project's lastUpdated timestamp
   await db

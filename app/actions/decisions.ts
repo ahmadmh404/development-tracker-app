@@ -23,17 +23,14 @@ export async function createDecision(
 
   if (!feature) return { error: "Feature not found" };
 
-  const [decision] = await db
-    .insert(decisions)
-    .values({
-      ...validated,
-      featureId,
-      date: validated.date ? new Date(validated.date) : new Date(),
-      pros: validated.pros ?? [],
-      cons: validated.cons ?? [],
-      alternatives: validated.alternatives ?? null,
-    })
-    .returning();
+  await db.insert(decisions).values({
+    ...validated,
+    featureId,
+    date: validated.date ? new Date(validated.date) : new Date(),
+    pros: validated.pros ?? [],
+    cons: validated.cons ?? [],
+    alternatives: validated.alternatives ?? null,
+  });
 
   // Update project's lastUpdated timestamp
   await db
@@ -44,7 +41,7 @@ export async function createDecision(
   revalidateTag(`project-${feature.projectId}`, "max");
   revalidateTag(`project-${feature.projectId}-features`, "max");
 
-  return { decision, error: null };
+  return { error: null };
 }
 
 export async function updateDecision(
@@ -56,7 +53,7 @@ export async function updateDecision(
 
   const validated = decisionSchema.partial().parse(data);
 
-  const [decision] = await db
+  await db
     .update(decisions)
     .set({
       ...validated,
@@ -65,8 +62,7 @@ export async function updateDecision(
       cons: validated.cons ?? [],
       alternatives: validated.alternatives ?? null,
     })
-    .where(eq(decisions.id, id))
-    .returning();
+    .where(eq(decisions.id, id));
 
   // Update project's lastUpdated timestamp
   await db

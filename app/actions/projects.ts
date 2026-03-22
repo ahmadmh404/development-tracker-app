@@ -16,17 +16,13 @@ import { redirect } from "next/navigation";
 export async function createProject(data: ProjectFormData) {
   const validated = projectSchema.parse(data);
 
-  const [project] = await db
-    .insert(projects)
-    .values({
-      ...validated,
-      status: validated.status ?? "Planning",
-      techStack: validated.techStack ?? [],
-    })
-    .returning();
+  await db.insert(projects).values({
+    ...validated,
+    status: validated.status ?? "Planning",
+    techStack: validated.techStack ?? [],
+  });
 
   revalidateTag("projects", "max");
-  return project;
 }
 
 export async function updateProject(
@@ -36,14 +32,13 @@ export async function updateProject(
   const existingProject = await getProjectById(id);
   if (existingProject == null) return { error: "Project not found" };
 
-  const [project] = await db
+  await db
     .update(projects)
     .set({
       ...data,
       lastUpdated: new Date(),
     })
-    .where(eq(projects.id, id))
-    .returning();
+    .where(eq(projects.id, id));
 
   revalidateTag("projects", "max");
   revalidateTag(`project-${id}`, "max");
@@ -88,8 +83,7 @@ export async function editProjectName(id: string, name: string) {
       name,
       lastUpdated: new Date(),
     })
-    .where(eq(projects.id, id))
-    .returning();
+    .where(eq(projects.id, id));
 
   revalidateTag("projects", "max");
   revalidateTag(`project-${id}`, "max");
